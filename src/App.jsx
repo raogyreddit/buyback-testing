@@ -13,6 +13,8 @@ import Register from './pages/Register'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 import AboutUs from './pages/AboutUs'
+import AdminRedirect from './pages/AdminRedirect'
+import AgentRedirect from './pages/AgentRedirect'
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, checkAuth } = useStore()
@@ -51,6 +53,10 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/about-us" element={<AboutUs />} />
+        
+        {/* Hidden routes for admin and agent panels */}
+        <Route path="/infra-control" element={<AdminRedirect />} />
+        <Route path="/field-tech" element={<AgentRedirect />} />
         
         {/* Protected Routes - Login required */}
         <Route
