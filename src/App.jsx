@@ -13,6 +13,7 @@ import Register from './pages/Register'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 import AboutUs from './pages/AboutUs'
+import DeleteAccount from './pages/DeleteAccount'
 
 // Admin Panel imports
 import { useStore as useAdminStore } from './admin/store/useStore'
@@ -142,6 +143,7 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/delete-account" element={<DeleteAccount />} />
         
         {/* Admin Panel Routes - All under /infra-control */}
         <Route path="/infra-control">
