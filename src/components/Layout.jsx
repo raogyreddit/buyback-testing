@@ -9,8 +9,10 @@ import {
   Menu,
   X,
   Apple,
+  Bell,
+  ChevronDown,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const navItems = [
   { path: '/dashboard', icon: Home, label: 'Dashboard', mobileLabel: 'Home' },
@@ -24,6 +26,8 @@ export default function Layout() {
   const navigate = useNavigate()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef(null)
 
   const handleLogout = async () => {
     await logout()
@@ -32,20 +36,27 @@ export default function Layout() {
 
   const displayName = userProfile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Customer'
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   return (
     <div className="min-h-screen bg-gray-50/50">
-      {/* Sidebar backdrop */}
+      {/* Mobile Sidebar backdrop */}
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity lg:hidden"
+          onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Slide-in Sidebar */}
+      {/* Mobile Slide-in Sidebar */}
       <aside className={`
         fixed top-0 left-0 z-50 h-full w-[260px] bg-white shadow-2xl shadow-gray-300/30
         transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+        lg:hidden
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex items-center justify-between h-14 px-4 border-b border-gray-100">
@@ -62,19 +73,12 @@ export default function Layout() {
 
         <nav className="p-2.5 space-y-0.5">
           {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === '/dashboard'}
+            <NavLink key={item.path} to={item.path} end={item.path === '/dashboard'}
               className={({ isActive }) => `
                 flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm
-                ${isActive 
-                  ? 'bg-indigo-50 text-indigo-600 font-semibold' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                }
+                ${isActive ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'}
               `}
-              onClick={() => setSidebarOpen(false)}
-            >
+              onClick={() => setSidebarOpen(false)}>
               <item.icon className="w-[18px] h-[18px]" />
               {item.label}
             </NavLink>
@@ -84,51 +88,102 @@ export default function Layout() {
         <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-100">
           <div className="flex items-center gap-2.5 mb-2.5 px-1">
             <div className="w-9 h-9 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
-              <span className="text-indigo-600 font-bold text-sm">
-                {displayName[0]?.toUpperCase() || 'C'}
-              </span>
+              <span className="text-indigo-600 font-bold text-sm">{displayName[0]?.toUpperCase() || 'C'}</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm text-gray-900 truncate">{displayName}</p>
               <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-red-500 hover:bg-red-50 rounded-lg transition-colors font-medium"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Logout
+          <button onClick={handleLogout}
+            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-red-500 hover:bg-red-50 rounded-lg transition-colors font-medium">
+            <LogOut className="w-3.5 h-3.5" /> Logout
           </button>
         </div>
       </aside>
 
       {/* Main content */}
       <div className="pb-16 lg:pb-0">
-        {/* Top bar */}
-        <header className="sticky top-0 z-30 h-14 glass border-b border-gray-100/50 flex items-center px-4">
-          <button className="p-2 hover:bg-gray-100/80 rounded-xl mr-3 transition-colors" onClick={() => setSidebarOpen(true)}>
-            <Menu className="w-5 h-5 text-gray-500" />
-          </button>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-              <Apple className="w-3.5 h-3.5 text-white" />
+        {/* Desktop Header with inline tabs */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100/60">
+          <div className="max-w-6xl mx-auto px-4 lg:px-6">
+            <div className="flex items-center h-16">
+              {/* Mobile hamburger */}
+              <button className="p-2 hover:bg-gray-100/80 rounded-xl mr-3 transition-colors lg:hidden" onClick={() => setSidebarOpen(true)}>
+                <Menu className="w-5 h-5 text-gray-500" />
+              </button>
+
+              {/* Logo */}
+              <div className="flex items-center gap-2 mr-8">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
+                  <Apple className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-extrabold text-sm text-gradient hidden sm:block">BuyBack Elite</span>
+              </div>
+
+              {/* Desktop Tab Navigation */}
+              <nav className="hidden lg:flex items-center gap-1">
+                {navItems.map((item) => {
+                  const isActive = item.path === '/dashboard'
+                    ? location.pathname === '/dashboard'
+                    : location.pathname.startsWith(item.path)
+                  return (
+                    <NavLink key={item.path} to={item.path} end={item.path === '/dashboard'}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium transition-all ${
+                        isActive
+                          ? 'bg-indigo-50 text-indigo-600'
+                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                      }`}>
+                      <item.icon className="w-4 h-4" />
+                      {item.label}
+                    </NavLink>
+                  )
+                })}
+              </nav>
+
+              <div className="flex-1" />
+
+              {/* Right side */}
+              <div className="flex items-center gap-2">
+                <button className="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                  <Bell className="w-[18px] h-[18px] text-gray-400" />
+                </button>
+
+                {/* Profile dropdown */}
+                <div className="relative" ref={profileRef}>
+                  <button onClick={() => setProfileOpen(!profileOpen)}
+                    className="flex items-center gap-2 p-1.5 pr-3 hover:bg-gray-50 rounded-xl transition-colors">
+                    <div className="w-8 h-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
+                      <span className="text-indigo-600 font-bold text-xs">{displayName[0]?.toUpperCase() || 'C'}</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 hidden sm:block">{displayName}</span>
+                    <ChevronDown className="w-3.5 h-3.5 text-gray-400 hidden sm:block" />
+                  </button>
+
+                  {profileOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-200/50 py-1.5 z-50 animate-scale-in">
+                      <div className="px-4 py-2.5 border-b border-gray-100">
+                        <p className="font-semibold text-sm text-gray-900">{displayName}</p>
+                        <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
+                      </div>
+                      <NavLink to="/dashboard/profile" onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                        <User className="w-4 h-4" /> My Profile
+                      </NavLink>
+                      <button onClick={() => { setProfileOpen(false); handleLogout() }}
+                        className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-            <span className="font-extrabold text-sm text-gradient">BuyBack Elite</span>
-          </div>
-          <div className="flex-1" />
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
-              <span className="text-indigo-600 font-bold text-xs">
-                {displayName[0]?.toUpperCase() || 'C'}
-              </span>
-            </div>
-            <span className="text-sm font-medium text-gray-700 hidden sm:block">{displayName}</span>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="p-3 lg:p-5 max-w-6xl mx-auto">
+        <main className="p-3 lg:p-6 max-w-6xl mx-auto">
           <Outlet />
         </main>
       </div>
@@ -141,11 +196,8 @@ export default function Layout() {
               ? location.pathname === '/dashboard' 
               : location.pathname.startsWith(item.path)
             return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1 relative"
-              >
+              <NavLink key={item.path} to={item.path}
+                className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1 relative">
                 {isActive && (
                   <div className="absolute -top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-indigo-600 rounded-full" />
                 )}

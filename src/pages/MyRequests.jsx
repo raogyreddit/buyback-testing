@@ -144,7 +144,7 @@ export default function MyRequests() {
             return (
               <div
                 key={req.id}
-                onClick={() => navigate(`/requests/${req.id}`)}
+                onClick={() => navigate(`/dashboard/requests/${req.id}`)}
                 className="bg-white rounded-xl border border-gray-200 p-4 lg:p-5 hover:shadow-md hover:border-primary-200 transition-all cursor-pointer"
               >
                 <div className="flex items-start gap-4">

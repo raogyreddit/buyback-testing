@@ -1,0 +1,163 @@
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { useStore } from '../store/useStore'
+import { 
+  LayoutDashboard, 
+  ShoppingBag, 
+  DollarSign, 
+  Sliders,
+  AlertTriangle,
+  LogOut,
+  Menu,
+  X,
+  Shield,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+const navItems = [
+  { path: '/infra-control', icon: LayoutDashboard, label: 'Dashboard', mobileLabel: 'Home' },
+  { path: '/infra-control/requests', icon: ShoppingBag, label: 'Sell Requests', mobileLabel: 'Requests' },
+  { path: '/infra-control/price-engine', icon: DollarSign, label: 'Price Engine', mobileLabel: 'Pricing' },
+  { path: '/infra-control/condition-deductions', icon: Sliders, label: 'Condition Pricing', mobileLabel: 'Conditions' },
+  { path: '/infra-control/fraud-alerts', icon: AlertTriangle, label: 'Fraud Alerts', mobileLabel: 'Alerts' },
+]
+
+export default function Layout() {
+  const { admin, logout, subscribeToRealtime, unsubscribeFromRealtime } = useStore()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true) // Desktop: collapsed by default
+
+  useEffect(() => {
+    subscribeToRealtime()
+    return () => unsubscribeFromRealtime()
+  }, [])
+
+  const handleLogout = async () => {
+    unsubscribeFromRealtime()
+    await logout()
+    navigate('/infra-control/login')
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile/Desktop sidebar backdrop */}
+      {(sidebarOpen || (!sidebarCollapsed)) && (
+        <div 
+          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+          onClick={() => { setSidebarOpen(false); setSidebarCollapsed(true) }}
+        />
+      )}
+
+      {/* Collapsible Sidebar - slides in on desktop too */}
+      <aside className={`
+        fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 shadow-xl
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen || !sidebarCollapsed ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="flex items-center justify-between h-14 px-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-indigo-600 flex items-center justify-center">
+              <Shield className="w-4 h-4 text-white" />
+            </div>
+            <h1 className="text-base font-bold bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">Admin Panel</h1>
+          </div>
+          <button className="p-1.5 hover:bg-gray-100 rounded-lg" onClick={() => { setSidebarOpen(false); setSidebarCollapsed(true) }}>
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+
+        <nav className="p-2 space-y-0.5">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.path === '/infra-control'}
+              className={({ isActive }) => `
+                flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm
+                ${isActive 
+                  ? 'bg-primary-50 text-primary-600 font-semibold' 
+                  : 'text-gray-600 hover:bg-gray-100'
+                }
+              `}
+              onClick={() => { setSidebarOpen(false); setSidebarCollapsed(true) }}
+            >
+              <item.icon className="w-5 h-5" />
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-200">
+          <div className="flex items-center gap-2 mb-2 px-1">
+            <div className="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center">
+              <span className="text-primary-600 font-semibold text-sm">{admin?.name?.[0] || 'A'}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm truncate">{admin?.name || 'Admin'}</p>
+              <p className="text-xs text-gray-500 truncate">{admin?.email}</p>
+            </div>
+          </div>
+          <button onClick={handleLogout}
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main content - full width when sidebar collapsed */}
+      <div className="pb-16 lg:pb-0">
+        {/* Top bar with menu toggle */}
+        <header className="sticky top-0 z-30 h-14 bg-white border-b border-gray-200 flex items-center px-4">
+          <button 
+            className="p-2 hover:bg-gray-100 rounded-lg mr-3" 
+            onClick={() => { setSidebarOpen(true); setSidebarCollapsed(false) }}
+          >
+            <Menu className="w-5 h-5 text-gray-600" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-indigo-600 flex items-center justify-center">
+              <Shield className="w-3.5 h-3.5 text-white" />
+            </div>
+            <span className="font-bold text-sm bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">Admin Panel</span>
+          </div>
+          <div className="flex-1" />
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <span>Welcome, <strong className="text-gray-800">{admin?.name || 'Admin'}</strong></span>
+          </div>
+        </header>
+
+        {/* Page content - full width */}
+        <main className="p-3 lg:p-4">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* Mobile Bottom Tab Bar */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 lg:hidden safe-area-bottom">
+        <div className="flex items-center justify-around h-14 px-1">
+          {navItems.map((item) => {
+            const isActive = item.path === '/infra-control' 
+              ? location.pathname === '/infra-control' 
+              : location.pathname.startsWith(item.path)
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1"
+              >
+                <item.icon className={`w-5 h-5 ${isActive ? 'text-primary-600' : 'text-gray-400'}`} />
+                <span className={`text-[10px] leading-tight ${isActive ? 'text-primary-600 font-semibold' : 'text-gray-400'}`}>
+                  {item.mobileLabel}
+                </span>
+              </NavLink>
+            )
+          })}
+        </div>
+      </nav>
+    </div>
+  )
+}

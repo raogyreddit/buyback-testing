@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { supabase } from '../lib/supabase'
@@ -7,7 +7,8 @@ import {
   AlertCircle, IndianRupee, Package, MapPin, Phone, Mail,
   User, Monitor, Battery, Keyboard, Speaker, Wifi, Video,
   MousePointer, Usb, ShieldCheck, Box, ChevronDown, ChevronUp,
-  Navigation, Truck, CreditCard, Banknote, Upload, Save
+  Navigation, Truck, CreditCard, Banknote, Upload, Save,
+  ZoomIn, ChevronLeft, ChevronRight, X
 } from 'lucide-react'
 
 const STATUS_CONFIG = {
@@ -38,9 +39,15 @@ export default function RequestDetail() {
   const [paymentSaving, setPaymentSaving] = useState(false)
   const [paymentSaved, setPaymentSaved] = useState(false)
 
+  // Photo zoom state
+  const [zoomPhoto, setZoomPhoto] = useState(null)
+  const [zoomIndex, setZoomIndex] = useState(0)
+  const [photoGallery, setPhotoGallery] = useState([])
+
+  // Always fetch requests on mount to ensure data is available
   useEffect(() => {
-    if (sellRequests.length === 0) fetchUserRequests()
-  }, [])
+    fetchUserRequests()
+  }, [id])
 
   const request = sellRequests.find(r => r.id === id)
 
@@ -58,12 +65,22 @@ export default function RequestDetail() {
     }
   }, [request?.id, request?.status])
 
+  // Show loading while fetching
+  if (isLoading && !request) {
+    return (
+      <div className="max-w-4xl mx-auto text-center py-16">
+        <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-500">Loading request details...</p>
+      </div>
+    )
+  }
+
   if (!request) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Request Not Found</h3>
-        <button onClick={() => navigate('/requests')} className="text-primary-600 font-medium hover:underline">
+        <button onClick={() => navigate('/dashboard/requests')} className="text-primary-600 font-medium hover:underline">
           Back to Requests
         </button>
       </div>
@@ -132,7 +149,7 @@ export default function RequestDetail() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <button
-        onClick={() => navigate('/requests')}
+        onClick={() => navigate('/dashboard/requests')}
         className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 font-medium"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Requests
@@ -155,9 +172,9 @@ export default function RequestDetail() {
         </span>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Status Card */}
           <div className={`rounded-xl p-4 ${statusConfig.bg} border`}>
             <p className={`font-semibold ${statusConfig.text}`}>{statusConfig.label}</p>
@@ -302,13 +319,16 @@ export default function RequestDetail() {
 
           {/* Photos */}
           {request.photos_url && request.photos_url.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Device Photos</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">Device Photos <span className="text-xs text-gray-400 font-normal">Tap to zoom</span></h3>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {request.photos_url.map((url, i) => (
-                  <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                    <img src={url} alt={`Photo ${i+1}`} className="w-full aspect-square object-cover rounded-lg border border-gray-200 hover:opacity-90 transition-opacity" />
-                  </a>
+                  <div key={i} className="relative cursor-pointer group" onClick={() => { setPhotoGallery(request.photos_url); setZoomIndex(i); setZoomPhoto(url); }}>
+                    <img src={url} alt={`Photo ${i+1}`} className="w-full aspect-square object-cover rounded-lg border border-gray-200 group-hover:opacity-80 transition-opacity" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-lg">
+                      <ZoomIn className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -568,6 +588,47 @@ export default function RequestDetail() {
           )}
         </div>
       </div>
+
+      {/* Photo Zoom Modal */}
+      {zoomPhoto && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex flex-col items-center justify-center" onClick={() => setZoomPhoto(null)}>
+          {/* Close button */}
+          <button onClick={() => setZoomPhoto(null)} className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white">
+            <X className="w-6 h-6" />
+          </button>
+          {/* Photo counter */}
+          <div className="absolute top-4 left-4 text-white/70 text-sm font-medium bg-black/40 px-3 py-1 rounded-full">
+            {zoomIndex + 1} / {photoGallery.length}
+          </div>
+          {/* Main image */}
+          <div className="flex-1 flex items-center justify-center w-full px-12 sm:px-20" onClick={e => e.stopPropagation()}>
+            <img src={zoomPhoto} alt="Zoomed" className="max-w-full max-h-[75vh] object-contain rounded-lg" />
+          </div>
+          {/* Navigation arrows */}
+          {photoGallery.length > 1 && (
+            <>
+              <button onClick={(e) => { e.stopPropagation(); const prev = (zoomIndex - 1 + photoGallery.length) % photoGallery.length; setZoomIndex(prev); setZoomPhoto(photoGallery[prev]); }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/25 rounded-full text-white">
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); const next = (zoomIndex + 1) % photoGallery.length; setZoomIndex(next); setZoomPhoto(photoGallery[next]); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/25 rounded-full text-white">
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
+          {/* Thumbnail strip */}
+          {photoGallery.length > 1 && (
+            <div className="flex gap-2 py-3 px-4 overflow-x-auto max-w-full" onClick={e => e.stopPropagation()}>
+              {photoGallery.map((url, i) => (
+                <img key={i} src={url} alt={`Thumb ${i+1}`}
+                  onClick={() => { setZoomIndex(i); setZoomPhoto(url); }}
+                  className={`w-14 h-14 object-cover rounded-lg cursor-pointer border-2 shrink-0 transition-all ${i === zoomIndex ? 'border-white opacity-100 scale-110' : 'border-transparent opacity-50 hover:opacity-80'}`} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

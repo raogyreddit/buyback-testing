@@ -146,6 +146,21 @@ export default function SellDevice() {
           <button
             onClick={() => {
               if (sellStep === 3) calculatePrice()
+              // Validate address fields before proceeding from Personal Info step
+              if (sellStep === 5) {
+                const missing = []
+                if (!personalInfo.fullName?.trim()) missing.push('Full Name')
+                if (!personalInfo.email?.trim()) missing.push('Email')
+                if (!personalInfo.phone?.trim()) missing.push('Phone Number')
+                if (!personalInfo.address?.trim()) missing.push('Full Address')
+                if (!personalInfo.city?.trim()) missing.push('City')
+                if (!personalInfo.state?.trim()) missing.push('State')
+                if (!personalInfo.pincode?.trim()) missing.push('Pincode')
+                if (missing.length > 0) {
+                  alert(`Please fill in all required fields:\n\n${missing.join('\n')}`)
+                  return
+                }
+              }
               goNext()
             }}
             className="flex items-center gap-2 px-6 py-2.5 gradient-bg text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
@@ -636,29 +651,62 @@ function StepPersonalInfo({ info, setInfo, deliveryMethod, setDeliveryMethod, us
   const detectLocation = async () => {
     if (!navigator.geolocation) return alert('Geolocation not supported by your browser')
     setDetectingLocation(true)
+    
+    // Use high accuracy GPS with fresh location (no cache)
+    const geoOptions = {
+      enableHighAccuracy: true,  // Use GPS if available
+      timeout: 30000,            // Wait up to 30 seconds
+      maximumAge: 0              // Don't use cached location - get fresh position
+    }
+    
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords
+        const { latitude, longitude, accuracy } = position.coords
+        console.log(`[Location] Got position: ${latitude}, ${longitude} (accuracy: ${accuracy}m)`)
+        
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+          // Use Google Maps Geocoding API if available, fallback to Nominatim
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`)
           const data = await res.json()
           const addr = data.address || {}
-          const fullAddress = data.display_name || ''
-          const pincode = addr.postcode || ''
-          const city = addr.city || addr.town || addr.village || ''
+          
+          // Build a more precise address
+          const houseNumber = addr.house_number || ''
+          const road = addr.road || addr.street || ''
+          const neighbourhood = addr.neighbourhood || addr.suburb || ''
+          const city = addr.city || addr.town || addr.village || addr.county || ''
           const state = addr.state || ''
-          setUserLocation({ latitude, longitude, address: fullAddress })
+          const pincode = addr.postcode || ''
+          
+          // Create a cleaner address format
+          let addressParts = []
+          if (houseNumber) addressParts.push(houseNumber)
+          if (road) addressParts.push(road)
+          if (neighbourhood) addressParts.push(neighbourhood)
+          if (city) addressParts.push(city)
+          if (state) addressParts.push(state)
+          if (pincode) addressParts.push(pincode)
+          
+          const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : data.display_name || ''
+          
+          setUserLocation({ latitude, longitude, address: fullAddress, accuracy })
           setInfo({ address: fullAddress, pincode, city, state })
-        } catch {
-          setUserLocation({ latitude, longitude, address: `${latitude}, ${longitude}` })
+        } catch (e) {
+          console.error('[Location] Reverse geocoding failed:', e)
+          setUserLocation({ latitude, longitude, address: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}` })
         }
         setDetectingLocation(false)
       },
       (err) => {
-        alert('Location access denied. Please enter address manually.')
+        console.error('[Location] Error:', err.code, err.message)
+        let errorMsg = 'Location access denied. Please enter address manually.'
+        if (err.code === 1) errorMsg = 'Location permission denied. Please allow location access and try again.'
+        else if (err.code === 2) errorMsg = 'Location unavailable. Please check your GPS/network and try again.'
+        else if (err.code === 3) errorMsg = 'Location request timed out. Please try again or enter address manually.'
+        alert(errorMsg)
         setDetectingLocation(false)
       },
-      { enableHighAccuracy: true, timeout: 15000 }
+      geoOptions
     )
   }
 
