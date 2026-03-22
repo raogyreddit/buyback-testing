@@ -638,6 +638,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-5 text-xs text-gray-600">
               <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
               <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms</Link>
+              <Link to="/delete-account" className="hover:text-white transition-colors">Delete Account</Link>
             </div>
           </div>
         </div>
