@@ -4,7 +4,8 @@ import {
   Smartphone, Laptop, Shield, Zap, IndianRupee,
   CheckCircle2, ArrowRight, MapPin, Phone,
   Mail, ChevronDown, Truck, CreditCard, HeadphonesIcon, 
-  Download, Apple, Menu, X, Sparkles, BadgeCheck, User
+  Download, Apple, Menu, X, Sparkles, BadgeCheck, User,
+  Clock, Building2, ExternalLink
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
@@ -123,10 +124,8 @@ export default function LandingPage() {
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-18">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
-                <Apple className="w-5 h-5 text-white" />
-              </div>
+            <Link to="/" className="flex items-center gap-2 group">
+              <img src="/logo.png" alt="BuyBack Elite" className="w-9 h-9 object-contain rounded-xl" />
               <span className="text-lg font-extrabold text-gradient">BuyBack Elite</span>
             </Link>
             <div className="hidden md:flex items-center gap-1">
@@ -379,17 +378,16 @@ export default function LandingPage() {
       </section>
 
       {/* ==================== HOW IT WORKS ==================== */}
-      <section id="how-it-works" className="relative py-20 sm:py-24 overflow-hidden">
-        <div className="absolute inset-0 gradient-dark noise-overlay" />
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px]" />
+      <section id="how-it-works" className="relative py-20 sm:py-24 overflow-hidden bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-white">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-200/25 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-200/25 rounded-full blur-[100px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal className="text-center mb-14">
-            <p className="text-indigo-400 font-semibold text-sm uppercase tracking-wider mb-3">Simple Process</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
-              Three Steps to Get Paid
+            <p className="text-indigo-600 font-semibold text-sm uppercase tracking-wider mb-3">Simple Process</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+              Three Steps to <span className="text-gradient">Get Paid</span>
             </h2>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
               Sell your device in under 24 hours. It's that simple.
             </p>
           </Reveal>
@@ -397,19 +395,19 @@ export default function LandingPage() {
             {steps.map((step, i) => (
               <Reveal key={i} delay={`stagger-${i + 1}`}>
                 <div className="relative group">
-                  <div className="glass-dark rounded-2xl p-7 hover:bg-white/[0.08] transition-all h-full">
+                  <div className="bg-white rounded-2xl p-7 border border-indigo-100/60 shadow-sm hover:shadow-xl hover:shadow-indigo-100/60 hover:-translate-y-1 transition-all h-full">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
                         <step.icon className="w-6 h-6 text-white" />
                       </div>
-                      <span className="text-4xl font-extrabold text-white/10">{step.num}</span>
+                      <span className="text-4xl font-extrabold text-indigo-100">{step.num}</span>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
                   </div>
                   {i < 2 && (
                     <div className="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 z-10">
-                      <ArrowRight className="w-6 h-6 text-white/20" />
+                      <ArrowRight className="w-6 h-6 text-indigo-300" />
                     </div>
                   )}
                 </div>
@@ -418,7 +416,7 @@ export default function LandingPage() {
           </div>
           <Reveal className="text-center mt-12">
             <button onClick={() => navigate('/dashboard/sell')}
-              className="bg-white text-gray-900 px-8 py-3.5 rounded-full font-bold text-base hover:shadow-xl hover:-translate-y-0.5 transition-all">
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3.5 rounded-full font-bold text-base hover:shadow-xl hover:shadow-indigo-500/25 hover:-translate-y-0.5 transition-all">
               Start Selling Now
             </button>
           </Reveal>
@@ -591,54 +589,157 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
+      {/* ==================== STORE LOCATION ==================== */}
+      <section id="location" className="py-20 sm:py-24 bg-gradient-to-b from-white to-slate-50/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Reveal className="text-center mb-14">
+            <p className="text-indigo-600 font-semibold text-sm uppercase tracking-wider mb-3">Find Us</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+              Visit Our <span className="text-gradient">Store</span>
+            </h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+              Drop by for an in-person assessment and same-day payment at our Noida store.
+            </p>
+          </Reveal>
+          <div className="grid lg:grid-cols-5 gap-8 items-start">
+            {/* Map - takes 3 cols */}
+            <Reveal className="lg:col-span-3 rounded-3xl overflow-hidden shadow-xl shadow-indigo-100/40 border border-indigo-50">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3504.785!2d77.3229394!3d28.5669834!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce44977e862ab%3A0x8db2f2a2c85f5957!2sThe%20Great%20India%20Place!5e0!3m2!1sen!2sin!4v1743412800000!5m2!1sen!2sin"
+                width="100%"
+                height="420"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Macintosh Enterprise - The Great India Place, Noida"
+              />
+            </Reveal>
+            {/* Store Info - takes 2 cols */}
+            <Reveal className="lg:col-span-2 space-y-4">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20">
+                    <Building2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-base mb-1">Macintosh Enterprise</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed">
+                      Shop No. 157, 1st Floor<br />
+                      The Great India Place<br />
+                      Sector 38A, Noida – 201301<br />
+                      Uttar Pradesh, India
+                    </p>
+                    <a
+                      href="https://www.google.com/maps/place/The+Great+India+Place/@28.5669834,77.3229394,17z"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1.5 text-indigo-600 font-semibold text-sm hover:text-indigo-800 transition-colors"
+                    >
+                      Get Directions <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20">
+                    <Phone className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Contact Us</h3>
+                    <a href="tel:+919166936697" className="block text-gray-600 text-sm hover:text-indigo-600 transition-colors">+91 91669 36697</a>
+                    <a href="mailto:contact@buybackelite.com" className="block text-gray-600 text-sm hover:text-indigo-600 transition-colors">contact@buybackelite.com</a>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
+                    <Clock className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Store Hours</h3>
+                    <p className="text-gray-500 text-sm">Mon – Sat: 10:00 AM – 9:00 PM</p>
+                    <p className="text-gray-500 text-sm">Sunday: 11:00 AM – 8:00 PM</p>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       {/* ==================== FOOTER ==================== */}
-      <footer className="bg-gray-950 text-white pt-16 pb-8">
+      <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
             <div>
               <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Apple className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-lg font-extrabold">BuyBack Elite</span>
+                <img src="/logo.png" alt="BuyBack Elite" className="w-9 h-9 object-contain rounded-xl" />
+                <span className="text-lg font-extrabold text-gray-900">BuyBack Elite</span>
               </div>
-              <p className="text-gray-500 text-sm leading-relaxed mb-5">
-                India's most trusted platform for selling MacBooks and iPads.
+              <p className="text-gray-400 text-sm leading-relaxed mb-5">
+                India's most trusted platform for selling MacBooks and iPads. Fast, fair & secure.
               </p>
+              <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-semibold">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                Trusted by 1000+ sellers
+              </div>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-4 text-gray-300">Quick Links</h4>
-              <ul className="space-y-2.5 text-sm text-gray-500">
-                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><Link to="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
+              <h4 className="font-bold text-sm mb-4 text-gray-800">Quick Links</h4>
+              <ul className="space-y-2.5 text-sm text-gray-400">
+                <li><a href="#features" className="hover:text-indigo-600 transition-colors">Features</a></li>
+                <li><a href="#how-it-works" className="hover:text-indigo-600 transition-colors">How It Works</a></li>
+                <li><a href="#pricing" className="hover:text-indigo-600 transition-colors">Pricing</a></li>
+                <li><a href="#location" className="hover:text-indigo-600 transition-colors">Our Store</a></li>
+                <li><Link to="/about-us" className="hover:text-indigo-600 transition-colors">About Us</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-4 text-gray-300">Devices We Buy</h4>
-              <ul className="space-y-2.5 text-sm text-gray-500">
-                <li>MacBook Air</li>
-                <li>MacBook Pro</li>
-                <li>iPad Pro</li>
-                <li>iPad Air / Mini</li>
+              <h4 className="font-bold text-sm mb-4 text-gray-800">Devices We Buy</h4>
+              <ul className="space-y-2.5 text-sm text-gray-400">
+                <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> MacBook Air</li>
+                <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> MacBook Pro</li>
+                <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> iPad Pro</li>
+                <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> iPad Air / Mini</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-4 text-gray-300">Contact</h4>
-              <ul className="space-y-2.5 text-sm text-gray-500">
-                <li className="flex items-center gap-2"><Mail className="w-3.5 h-3.5" /> support@buybackelite.com</li>
-                <li className="flex items-center gap-2"><Phone className="w-3.5 h-3.5" /> +91 98765 43210</li>
-                <li className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5" /> Mumbai, India</li>
+              <h4 className="font-bold text-sm mb-4 text-gray-800">Contact</h4>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <a href="mailto:contact@buybackelite.com" className="flex items-center gap-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                    <div className="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center shrink-0">
+                      <Mail className="w-3.5 h-3.5 text-indigo-500" />
+                    </div>
+                    contact@buybackelite.com
+                  </a>
+                </li>
+                <li>
+                  <a href="tel:+919166936697" className="flex items-center gap-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                    <div className="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
+                      <Phone className="w-3.5 h-3.5 text-emerald-500" />
+                    </div>
+                    +91 91669 36697
+                  </a>
+                </li>
+                <li className="flex items-start gap-2 text-gray-400">
+                  <div className="w-7 h-7 bg-rose-50 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                  </div>
+                  <span>Shop No. 157, 1st Floor,<br />The Great India Place, Noida</span>
+                </li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800/50 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-gray-600 text-xs">&copy; 2026 BuyBack Elite. All rights reserved.</p>
-            <div className="flex items-center gap-5 text-xs text-gray-600">
-              <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
-              <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms</Link>
-              <Link to="/delete-account" className="hover:text-white transition-colors">Delete Account</Link>
+          <div className="border-t border-gray-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-gray-400 text-xs">&copy; 2026 BuyBack Elite · Macintosh Enterprise. All rights reserved.</p>
+            <div className="flex items-center gap-5 text-xs text-gray-400">
+              <Link to="/privacy-policy" className="hover:text-indigo-600 transition-colors">Privacy</Link>
+              <Link to="/terms-of-service" className="hover:text-indigo-600 transition-colors">Terms</Link>
+              <Link to="/delete-account" className="hover:text-indigo-600 transition-colors">Delete Account</Link>
             </div>
           </div>
         </div>

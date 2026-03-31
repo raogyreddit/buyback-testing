@@ -15,26 +15,6 @@ import TermsOfService from './pages/TermsOfService'
 import AboutUs from './pages/AboutUs'
 import DeleteAccount from './pages/DeleteAccount'
 
-// Admin Panel imports
-import { useStore as useAdminStore } from './admin/store/useStore'
-import AdminLayout from './admin/components/Layout'
-import AdminLogin from './admin/pages/Login'
-import AdminDashboard from './admin/pages/Dashboard'
-import AdminRequests from './admin/pages/Requests'
-import AdminPriceEngine from './admin/pages/PriceEngine'
-import AdminConditionDeductions from './admin/pages/ConditionDeductions'
-import AdminFraudAlerts from './admin/pages/FraudAlerts'
-
-// Agent Panel imports
-import { useStore as useAgentStore } from './agent/store/useStore'
-import AgentLayout from './agent/components/Layout'
-import AgentLogin from './agent/pages/Login'
-import AgentDashboard from './agent/pages/Dashboard'
-import AgentPickups from './agent/pages/Pickups'
-import AgentPickupDetail from './agent/pages/PickupDetail'
-import AgentHistory from './agent/pages/History'
-import AgentProfile from './agent/pages/Profile'
-
 function ProtectedRoute({ children }) {
   const { isAuthenticated, checkAuth } = useStore()
   const [isChecking, setIsChecking] = useState(true)
@@ -62,77 +42,22 @@ function ProtectedRoute({ children }) {
   return children
 }
 
-// Admin Protected Route - uses admin store
-function AdminProtectedRoute({ children }) {
-  const { isAuthenticated, checkAuth } = useAdminStore()
-  const [isChecking, setIsChecking] = useState(true)
-  const location = useLocation()
-
+// Redirect component for old admin/agent URLs to proper subdomains
+function ExternalRedirect({ to }) {
   useEffect(() => {
-    console.log('[AdminProtectedRoute] Checking auth...')
-    checkAuth()
-      .then(result => console.log('[AdminProtectedRoute] checkAuth result:', result))
-      .finally(() => setIsChecking(false))
-  }, [checkAuth])
-
-  console.log('[AdminProtectedRoute] isChecking:', isChecking, 'isAuthenticated:', isAuthenticated)
-
-  if (isChecking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Admin...</p>
-        </div>
+    window.location.href = to
+  }, [to])
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-600">Redirecting...</p>
       </div>
-    )
-  }
-  
-  if (!isAuthenticated) {
-    console.log('[AdminProtectedRoute] Not authenticated, redirecting to /infra-control/login')
-    return <Navigate to="/infra-control/login" state={{ from: location }} replace />
-  }
-  
-  return children
-}
-
-// Agent Protected Route - uses agent store
-function AgentProtectedRoute({ children }) {
-  const { isAuthenticated, checkAuth } = useAgentStore()
-  const [isChecking, setIsChecking] = useState(true)
-  const location = useLocation()
-
-  useEffect(() => {
-    checkAuth().finally(() => setIsChecking(false))
-  }, [checkAuth])
-
-  if (isChecking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    )
-  }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/field-tech/login" state={{ from: location }} replace />
-  }
-  
-  return children
+    </div>
+  )
 }
 
 function App() {
-  // Debug logging
-  useEffect(() => {
-    console.log('App component mounted')
-    console.log('Environment variables:')
-    console.log('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL)
-    console.log('VITE_APP_URL:', import.meta.env.VITE_APP_URL)
-  }, [])
-
   return (
     <BrowserRouter>
       <Routes>
@@ -145,45 +70,9 @@ function App() {
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/delete-account" element={<DeleteAccount />} />
         
-        {/* Admin Panel Routes - All under /infra-control */}
-        <Route path="/infra-control">
-          {/* Public admin login */}
-          <Route path="login" element={<AdminLogin />} />
-          {/* Protected admin routes */}
-          <Route
-            element={
-              <AdminProtectedRoute>
-                <AdminLayout />
-              </AdminProtectedRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="requests" element={<AdminRequests />} />
-            <Route path="price-engine" element={<AdminPriceEngine />} />
-            <Route path="condition-deductions" element={<AdminConditionDeductions />} />
-            <Route path="fraud-alerts" element={<AdminFraudAlerts />} />
-          </Route>
-        </Route>
-        
-        {/* Agent Panel Routes - All under /field-tech */}
-        <Route path="/field-tech">
-          {/* Public agent login */}
-          <Route path="login" element={<AgentLogin />} />
-          {/* Protected agent routes */}
-          <Route
-            element={
-              <AgentProtectedRoute>
-                <AgentLayout />
-              </AgentProtectedRoute>
-            }
-          >
-            <Route index element={<AgentDashboard />} />
-            <Route path="pickups" element={<AgentPickups />} />
-            <Route path="pickups/:id" element={<AgentPickupDetail />} />
-            <Route path="history" element={<AgentHistory />} />
-            <Route path="profile" element={<AgentProfile />} />
-          </Route>
-        </Route>
+        {/* Redirect old admin/agent URLs to proper subdomains */}
+        <Route path="/infra-control/*" element={<ExternalRedirect to="https://control.buybackelite.com" />} />
+        <Route path="/field-tech/*" element={<ExternalRedirect to="https://field.buybackelite.com" />} />
         
         {/* Protected Routes - Login required */}
         <Route

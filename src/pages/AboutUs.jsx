@@ -151,7 +151,7 @@ export default function AboutUs() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium text-gray-900">support@buybackelite.com</p>
+                  <p className="font-medium text-gray-900">contact@buybackelite.com</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -160,7 +160,7 @@ export default function AboutUs() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Phone</p>
-                  <p className="font-medium text-gray-900">+91 98765 43210</p>
+                  <p className="font-medium text-gray-900">+91 91669 36697</p>
                 </div>
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function AboutUs() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Address</p>
-                  <p className="font-medium text-gray-900">New Delhi, India</p>
+                  <p className="font-medium text-gray-900">Shop No. 157, 1st Floor, The Great India Place, Noida</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">

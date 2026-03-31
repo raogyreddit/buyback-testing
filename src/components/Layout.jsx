@@ -61,9 +61,7 @@ export default function Layout() {
       `}>
         <div className="flex items-center justify-between h-14 px-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
-              <Apple className="w-4 h-4 text-white" />
-            </div>
+            <img src="/logo.png" alt="BuyBack Elite" className="w-8 h-8 object-contain rounded-lg" />
             <span className="text-sm font-extrabold text-gradient">BuyBack Elite</span>
           </div>
           <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" onClick={() => setSidebarOpen(false)}>
@@ -115,9 +113,7 @@ export default function Layout() {
 
               {/* Logo */}
               <div className="flex items-center gap-2 mr-8">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
-                  <Apple className="w-4 h-4 text-white" />
-                </div>
+                <img src="/logo.png" alt="BuyBack Elite" className="w-8 h-8 object-contain rounded-xl" />
                 <span className="font-extrabold text-sm text-gradient hidden sm:block">BuyBack Elite</span>
               </div>
 

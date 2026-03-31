@@ -69,9 +69,9 @@ export default function DeleteAccount() {
                 </p>
                 <div className="flex items-center gap-2 bg-white rounded-lg p-3 border border-gray-200">
                   <Mail className="w-5 h-5 text-blue-600" />
-                  <a href="mailto:support@buybackelite.com?subject=Account%20Deletion%20Request" 
+                  <a href="mailto:contact@buybackelite.com?subject=Account%20Deletion%20Request" 
                      className="text-blue-600 font-medium hover:underline">
-                    support@buybackelite.com
+                    contact@buybackelite.com
                   </a>
                 </div>
                 <p className="text-gray-500 text-sm mt-2">
@@ -159,8 +159,8 @@ export default function DeleteAccount() {
             <div className="space-y-2">
               <p className="text-gray-700">
                 <strong>Email:</strong>{' '}
-                <a href="mailto:support@buybackelite.com" className="text-blue-600 hover:underline">
-                  support@buybackelite.com
+                <a href="mailto:contact@buybackelite.com" className="text-blue-600 hover:underline">
+                  contact@buybackelite.com
                 </a>
               </p>
               <p className="text-gray-700">
