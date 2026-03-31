@@ -631,7 +631,7 @@ export default function LandingPage() {
                       Uttar Pradesh, India
                     </p>
                     <a
-                      href="https://www.google.com/maps/place/The+Great+India+Place/@28.5669834,77.3229394,17z"
+                      href="https://google.com/maps?cid=10210490086162651479&g_mp=CiVnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLkdldFBsYWNlEAEYASAB&hl=en&gl=IN&source=embed"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-3 inline-flex items-center gap-1.5 text-indigo-600 font-semibold text-sm hover:text-indigo-800 transition-colors"
