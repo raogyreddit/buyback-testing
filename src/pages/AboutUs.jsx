@@ -160,7 +160,7 @@ export default function AboutUs() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Phone</p>
-                  <p className="font-medium text-gray-900">+91 91669 36697</p>
+                  <p className="font-medium text-gray-900">+91 8595611340</p>
                 </div>
               </div>
             </div>

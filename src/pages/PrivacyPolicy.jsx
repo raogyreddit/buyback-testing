@@ -194,7 +194,7 @@ export default function PrivacyPolicy() {
               <p className="text-gray-700"><strong>BuyBack Elite</strong></p>
               <p className="text-gray-600">Website: <a href="https://buybackelite.com" className="text-primary-600 hover:underline">buybackelite.com</a></p>
               <p className="text-gray-600">Email: <a href="mailto:contact@buybackelite.com" className="text-primary-600 hover:underline">contact@buybackelite.com</a></p>
-              <p className="text-gray-600">Phone: +91 91669 36697</p>
+              <p className="text-gray-600">Phone: +91 8595611340</p>
               <p className="text-gray-600">Address: Shop No. 157, 1st Floor, The Great India Place, Noida</p>
             </div>
           </section>

@@ -648,7 +648,7 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">Contact Us</h3>
-                    <a href="tel:+919166936697" className="block text-gray-600 text-sm hover:text-indigo-600 transition-colors">+91 91669 36697</a>
+                    <a href="tel:+918595611340" className="block text-gray-600 text-sm hover:text-indigo-600 transition-colors">+91 8595611340</a>
                     <a href="mailto:contact@buybackelite.com" className="block text-gray-600 text-sm hover:text-indigo-600 transition-colors">contact@buybackelite.com</a>
                   </div>
                 </div>
@@ -718,11 +718,11 @@ export default function LandingPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="tel:+919166936697" className="flex items-center gap-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                  <a href="tel:+918595611340" className="flex items-center gap-2 text-gray-400 hover:text-indigo-600 transition-colors">
                     <div className="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
                       <Phone className="w-3.5 h-3.5 text-emerald-500" />
                     </div>
-                    +91 91669 36697
+                    +91 8595611340
                   </a>
                 </li>
                 <li className="flex items-start gap-2 text-gray-400">
