@@ -41,7 +41,7 @@ export default function Login() {
         
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-16 w-full">
           <Link to="/" className="flex items-center gap-2.5 mb-12">
-            <img src="/logo.png" alt="BuyBack Elite" className="w-10 h-10 object-contain rounded-xl" />
+            <img src="/app-logo.png" alt="BuyBack Elite" className="w-10 h-10 object-contain rounded-xl" />
             <span className="text-xl font-extrabold text-white">BuyBack Elite</span>
           </Link>
           
@@ -77,7 +77,7 @@ export default function Login() {
         <div className="w-full max-w-[400px] relative z-10">
           {/* Mobile logo */}
           <Link to="/" className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <img src="/logo.png" alt="BuyBack Elite" className="w-9 h-9 object-contain rounded-xl" />
+            <img src="/app-logo.png" alt="BuyBack Elite" className="w-9 h-9 object-contain rounded-xl" />
             <span className="text-xl font-extrabold text-gradient">BuyBack Elite</span>
           </Link>
 

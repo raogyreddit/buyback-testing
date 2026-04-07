@@ -82,7 +82,7 @@ export function onForegroundMessage(callback) {
     if (Notification.permission === 'granted' && payload.notification) {
       new Notification(payload.notification.title, {
         body: payload.notification.body,
-        icon: '/logo.png',
+        icon: '/app-logo.png',
       });
     }
 

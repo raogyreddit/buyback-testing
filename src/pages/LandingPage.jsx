@@ -125,7 +125,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-18">
             <Link to="/" className="flex items-center gap-2 group">
-              <img src="/logo.png" alt="BuyBack Elite" className="w-9 h-9 object-contain rounded-xl" />
+              <img src="/app-logo.png" alt="BuyBack Elite" className="w-9 h-9 object-contain rounded-xl" />
               <span className="text-lg font-extrabold text-gradient">BuyBack Elite</span>
             </Link>
             <div className="hidden md:flex items-center gap-1">
@@ -496,7 +496,7 @@ export default function LandingPage() {
           {/* Header */}
           <Reveal className="text-center mb-10">
             <div className="inline-flex items-center gap-2.5 mb-5">
-              <img src="/logo.png" alt="BuyBack Elite" className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl shadow-lg shadow-indigo-500/30 object-contain" />
+              <img src="/app-logo.png" alt="BuyBack Elite" className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl shadow-lg shadow-indigo-500/30 object-contain" />
               <div className="text-left">
                 <p className="text-white font-extrabold text-base sm:text-lg">BuyBack Elite</p>
                 <p className="text-indigo-300 text-[10px] sm:text-xs font-medium">Sell Smart. Get More.</p>
@@ -739,7 +739,7 @@ export default function LandingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
             <div>
               <div className="flex items-center gap-2.5 mb-5">
-                <img src="/logo.png" alt="BuyBack Elite" className="w-9 h-9 object-contain rounded-xl" />
+                <img src="/app-logo.png" alt="BuyBack Elite" className="w-9 h-9 object-contain rounded-xl" />
                 <span className="text-lg font-extrabold text-gray-900">BuyBack Elite</span>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-5">
