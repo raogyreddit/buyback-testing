@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { 
   Smartphone, Laptop, Shield, Zap, IndianRupee,
   CheckCircle2, ArrowRight, MapPin, Phone,
-  Mail, ChevronDown, Truck, CreditCard, HeadphonesIcon, 
+  Mail, ChevronDown, ChevronLeft, ChevronRight, Truck, CreditCard, HeadphonesIcon, 
   Download, Apple, Menu, X, Sparkles, BadgeCheck, User,
   Clock, Building2, ExternalLink
 } from 'lucide-react'
@@ -486,33 +486,48 @@ export default function LandingPage() {
       </section>
 
       {/* ==================== APP SHOWCASE ==================== */}
-      <section className="py-20 sm:py-24 relative overflow-hidden">
+      <section className="py-16 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900" />
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px]" />
+        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-purple-500/10 rounded-full blur-[80px]" />
         <div className="absolute inset-0 noise-overlay" />
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <Reveal className="text-center mb-14">
-            <div className="inline-flex items-center gap-3 mb-6">
-              <img src="/app-logo.png" alt="BuyBack Elite App" className="w-14 h-14 rounded-2xl shadow-lg shadow-indigo-500/30" />
+          <Reveal className="text-center mb-10">
+            <div className="inline-flex items-center gap-2.5 mb-5">
+              <img src="/logo.png" alt="BuyBack Elite" className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl shadow-lg shadow-indigo-500/30 object-contain" />
               <div className="text-left">
-                <p className="text-white font-extrabold text-lg">BuyBack Elite</p>
-                <p className="text-indigo-300 text-xs font-medium">Sell Smart. Get More.</p>
+                <p className="text-white font-extrabold text-base sm:text-lg">BuyBack Elite</p>
+                <p className="text-indigo-300 text-[10px] sm:text-xs font-medium">Sell Smart. Get More.</p>
               </div>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">
               Experience the App
             </h2>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Instant quotes, real-time tracking, and secure payments — everything in one beautifully crafted app.
+            <p className="text-sm sm:text-base text-gray-400 max-w-xl mx-auto">
+              Instant quotes, real-time tracking, and secure payments — all in one app.
             </p>
           </Reveal>
 
-          {/* Screenshot Slider */}
-          <div className="relative mb-14">
-            <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide px-4 sm:px-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {/* Screenshot Slider with Arrows */}
+          <div className="relative mb-10 group/slider">
+            {/* Left Arrow */}
+            <button
+              onClick={(e) => { const c = e.currentTarget.parentElement.querySelector('.screenshot-scroll'); c.scrollBy({ left: -200, behavior: 'smooth' }) }}
+              className="absolute left-0 sm:-left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white transition-all hover:scale-110 shadow-lg"
+            >
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+            {/* Right Arrow */}
+            <button
+              onClick={(e) => { const c = e.currentTarget.parentElement.querySelector('.screenshot-scroll'); c.scrollBy({ left: 200, behavior: 'smooth' }) }}
+              className="absolute right-0 sm:-right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white transition-all hover:scale-110 shadow-lg"
+            >
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+
+            <div className="screenshot-scroll flex gap-3 sm:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide mx-10 sm:mx-12" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {[
                 { img: '/screenshots/1.png', label: 'Select Device' },
                 { img: '/screenshots/2.png', label: 'Instant Quote' },
@@ -524,59 +539,59 @@ export default function LandingPage() {
                 { img: '/screenshots/8.png', label: 'Complete Experience' },
               ].map((s, i) => (
                 <div key={i} className="flex-shrink-0 snap-center group">
-                  <div className="w-[220px] sm:w-[250px] rounded-3xl overflow-hidden shadow-2xl shadow-black/40 border border-white/10 group-hover:border-indigo-500/40 group-hover:shadow-indigo-500/20 group-hover:-translate-y-2 transition-all duration-500">
+                  <div className="w-[140px] sm:w-[170px] lg:w-[190px] rounded-2xl overflow-hidden shadow-xl shadow-black/30 border border-white/10 group-hover:border-indigo-500/30 group-hover:-translate-y-1 transition-all duration-300">
                     <img src={s.img} alt={s.label} className="w-full h-auto" loading="lazy" />
                   </div>
-                  <p className="text-center text-gray-400 text-xs font-medium mt-3 group-hover:text-indigo-300 transition-colors">{s.label}</p>
+                  <p className="text-center text-gray-500 text-[10px] sm:text-xs font-medium mt-2 group-hover:text-indigo-300 transition-colors">{s.label}</p>
                 </div>
               ))}
             </div>
-            {/* Scroll hint gradient */}
-            <div className="absolute right-0 top-0 bottom-6 w-20 bg-gradient-to-l from-slate-900/90 to-transparent pointer-events-none hidden sm:block" />
-            <div className="absolute left-0 top-0 bottom-6 w-20 bg-gradient-to-r from-slate-900/90 to-transparent pointer-events-none hidden sm:block" />
+            {/* Edge fade */}
+            <div className="absolute right-10 sm:right-12 top-0 bottom-4 w-12 bg-gradient-to-l from-slate-900/80 to-transparent pointer-events-none" />
+            <div className="absolute left-10 sm:left-12 top-0 bottom-4 w-12 bg-gradient-to-r from-slate-900/80 to-transparent pointer-events-none" />
           </div>
 
           {/* Features + Download */}
           <Reveal>
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 sm:p-10 max-w-4xl mx-auto">
-              <div className="grid sm:grid-cols-2 gap-8 items-center">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 sm:p-8 max-w-3xl mx-auto">
+              <div className="grid sm:grid-cols-2 gap-6 items-center">
                 <div>
-                  <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="grid grid-cols-2 gap-2.5 mb-5">
                     {[
                       { icon: Zap, text: 'Instant Quotes', color: 'text-amber-400' },
                       { icon: Truck, text: 'Free Pickup', color: 'text-blue-400' },
                       { icon: Shield, text: 'Data Security', color: 'text-emerald-400' },
                       { icon: CreditCard, text: 'Same Day Pay', color: 'text-purple-400' },
                     ].map((f, i) => (
-                      <div key={i} className="flex items-center gap-2 text-white/80 text-sm">
-                        <f.icon className={`w-4 h-4 ${f.color} shrink-0`} />
+                      <div key={i} className="flex items-center gap-1.5 text-white/80 text-xs sm:text-sm">
+                        <f.icon className={`w-3.5 h-3.5 ${f.color} shrink-0`} />
                         <span>{f.text}</span>
                       </div>
                     ))}
                   </div>
                   <a href="https://play.google.com/store/apps/details?id=com.buybackelite.app" target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-3 bg-white text-gray-900 px-6 py-3.5 rounded-xl font-bold text-sm hover:shadow-xl hover:shadow-white/10 hover:-translate-y-0.5 transition-all">
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    className="inline-flex items-center gap-2.5 bg-white text-gray-900 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm hover:shadow-xl hover:shadow-white/10 hover:-translate-y-0.5 transition-all">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
                     </svg>
                     Download on Google Play
                   </a>
                 </div>
                 <div className="text-center sm:text-right">
-                  <div className="inline-flex items-center gap-4">
+                  <div className="inline-flex items-center gap-3 sm:gap-4">
                     <div>
-                      <p className="text-3xl font-extrabold text-white">4.8<span className="text-amber-400 text-lg ml-1">★</span></p>
-                      <p className="text-gray-400 text-xs">User Rating</p>
+                      <p className="text-2xl sm:text-3xl font-extrabold text-white">4.8<span className="text-amber-400 text-sm sm:text-lg ml-0.5">★</span></p>
+                      <p className="text-gray-400 text-[10px] sm:text-xs">User Rating</p>
                     </div>
-                    <div className="w-px h-10 bg-white/10" />
+                    <div className="w-px h-8 bg-white/10" />
                     <div>
-                      <p className="text-3xl font-extrabold text-white">1K+</p>
-                      <p className="text-gray-400 text-xs">Downloads</p>
+                      <p className="text-2xl sm:text-3xl font-extrabold text-white">1K+</p>
+                      <p className="text-gray-400 text-[10px] sm:text-xs">Downloads</p>
                     </div>
-                    <div className="w-px h-10 bg-white/10" />
+                    <div className="w-px h-8 bg-white/10" />
                     <div>
-                      <p className="text-3xl font-extrabold text-white">Free</p>
-                      <p className="text-gray-400 text-xs">No Charges</p>
+                      <p className="text-2xl sm:text-3xl font-extrabold text-white">Free</p>
+                      <p className="text-gray-400 text-[10px] sm:text-xs">No Charges</p>
                     </div>
                   </div>
                 </div>
