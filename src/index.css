@@ -247,6 +247,10 @@ nav a, nav button {
   background-clip: text;
 }
 
+/* Hide scrollbar for screenshot slider */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* Noise texture overlay */
 .noise-overlay::before {
   content: '';

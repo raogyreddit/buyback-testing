@@ -485,58 +485,106 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ==================== APP DOWNLOAD ==================== */}
-      <Reveal>
-        <section className="py-20 sm:py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-teal-700" />
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 px-4 py-1.5 rounded-full text-xs font-semibold text-white mb-6">
-                  <Download className="w-3.5 h-3.5" /> Available on Android
-                </div>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-5 leading-tight">
-                  Download the App for a Faster Experience
-                </h2>
-                <p className="text-lg text-emerald-100 mb-8 leading-relaxed">
-                  Instant quotes, real-time tracking, and push notifications — all from your phone.
-                </p>
-                <div className="grid grid-cols-2 gap-3 mb-8">
-                  {['Instant quotes', 'Live tracking', 'Push alerts', 'App-only deals'].map((t, i) => (
-                    <div key={i} className="flex items-center gap-2 text-white/90 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
-                      <span>{t}</span>
-                    </div>
-                  ))}
-                </div>
-                <a href="https://play.google.com/store/apps/details?id=com.buybackelite.app" target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 bg-black/80 text-white px-5 py-3 rounded-xl hover:bg-black transition-colors">
-                  <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
-                  </svg>
-                  <div className="text-left">
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Get it on</p>
-                    <p className="font-semibold text-sm">Google Play</p>
-                  </div>
-                </a>
+      {/* ==================== APP SHOWCASE ==================== */}
+      <section className="py-20 sm:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px]" />
+        <div className="absolute inset-0 noise-overlay" />
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <Reveal className="text-center mb-14">
+            <div className="inline-flex items-center gap-3 mb-6">
+              <img src="/app-logo.png" alt="BuyBack Elite App" className="w-14 h-14 rounded-2xl shadow-lg shadow-indigo-500/30" />
+              <div className="text-left">
+                <p className="text-white font-extrabold text-lg">BuyBack Elite</p>
+                <p className="text-indigo-300 text-xs font-medium">Sell Smart. Get More.</p>
               </div>
-              <div className="relative flex justify-center">
-                <div className="w-56 h-[420px] bg-gray-900 rounded-[2.5rem] p-2.5 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-700 animate-float-slow">
-                  <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2rem] flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                    <div className="text-center relative z-10">
-                      <Apple className="w-12 h-12 mx-auto mb-3 text-white/80" />
-                      <p className="text-white font-bold text-lg">BuyBack Elite</p>
-                      <p className="text-white/50 text-xs mt-1">Sell Smart. Get More.</p>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+              Experience the App
+            </h2>
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+              Instant quotes, real-time tracking, and secure payments — everything in one beautifully crafted app.
+            </p>
+          </Reveal>
+
+          {/* Screenshot Slider */}
+          <div className="relative mb-14">
+            <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide px-4 sm:px-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {[
+                { img: '/screenshots/1.png', label: 'Select Device' },
+                { img: '/screenshots/2.png', label: 'Instant Quote' },
+                { img: '/screenshots/3.png', label: 'Condition Check' },
+                { img: '/screenshots/4.png', label: 'Upload Photos' },
+                { img: '/screenshots/5.png', label: 'Schedule Pickup' },
+                { img: '/screenshots/6.png', label: 'Live Tracking' },
+                { img: '/screenshots/7.png', label: 'Secure Payment' },
+                { img: '/screenshots/8.png', label: 'Complete Experience' },
+              ].map((s, i) => (
+                <div key={i} className="flex-shrink-0 snap-center group">
+                  <div className="w-[220px] sm:w-[250px] rounded-3xl overflow-hidden shadow-2xl shadow-black/40 border border-white/10 group-hover:border-indigo-500/40 group-hover:shadow-indigo-500/20 group-hover:-translate-y-2 transition-all duration-500">
+                    <img src={s.img} alt={s.label} className="w-full h-auto" loading="lazy" />
+                  </div>
+                  <p className="text-center text-gray-400 text-xs font-medium mt-3 group-hover:text-indigo-300 transition-colors">{s.label}</p>
+                </div>
+              ))}
+            </div>
+            {/* Scroll hint gradient */}
+            <div className="absolute right-0 top-0 bottom-6 w-20 bg-gradient-to-l from-slate-900/90 to-transparent pointer-events-none hidden sm:block" />
+            <div className="absolute left-0 top-0 bottom-6 w-20 bg-gradient-to-r from-slate-900/90 to-transparent pointer-events-none hidden sm:block" />
+          </div>
+
+          {/* Features + Download */}
+          <Reveal>
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 sm:p-10 max-w-4xl mx-auto">
+              <div className="grid sm:grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {[
+                      { icon: Zap, text: 'Instant Quotes', color: 'text-amber-400' },
+                      { icon: Truck, text: 'Free Pickup', color: 'text-blue-400' },
+                      { icon: Shield, text: 'Data Security', color: 'text-emerald-400' },
+                      { icon: CreditCard, text: 'Same Day Pay', color: 'text-purple-400' },
+                    ].map((f, i) => (
+                      <div key={i} className="flex items-center gap-2 text-white/80 text-sm">
+                        <f.icon className={`w-4 h-4 ${f.color} shrink-0`} />
+                        <span>{f.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <a href="https://play.google.com/store/apps/details?id=com.buybackelite.app" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 bg-white text-gray-900 px-6 py-3.5 rounded-xl font-bold text-sm hover:shadow-xl hover:shadow-white/10 hover:-translate-y-0.5 transition-all">
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                    </svg>
+                    Download on Google Play
+                  </a>
+                </div>
+                <div className="text-center sm:text-right">
+                  <div className="inline-flex items-center gap-4">
+                    <div>
+                      <p className="text-3xl font-extrabold text-white">4.8<span className="text-amber-400 text-lg ml-1">★</span></p>
+                      <p className="text-gray-400 text-xs">User Rating</p>
+                    </div>
+                    <div className="w-px h-10 bg-white/10" />
+                    <div>
+                      <p className="text-3xl font-extrabold text-white">1K+</p>
+                      <p className="text-gray-400 text-xs">Downloads</p>
+                    </div>
+                    <div className="w-px h-10 bg-white/10" />
+                    <div>
+                      <p className="text-3xl font-extrabold text-white">Free</p>
+                      <p className="text-gray-400 text-xs">No Charges</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      </Reveal>
+          </Reveal>
+        </div>
+      </section>
 
       {/* ==================== FAQ ==================== */}
       <section id="faq" className="py-20 sm:py-24">
