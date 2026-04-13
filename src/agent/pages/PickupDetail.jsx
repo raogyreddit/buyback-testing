@@ -6,7 +6,7 @@ import {
   ArrowLeft, Laptop, Tablet, Phone, Mail, MapPin, Clock,
   Navigation, CheckCircle2, Package, IndianRupee, User,
   ExternalLink, AlertCircle, Camera, FileText, CreditCard,
-  ChevronDown, ChevronUp, Edit3, Check, X
+  ChevronDown, ChevronUp, Edit3, Check, X, MessageCircle
 } from 'lucide-react'
 
 const STATUS_FLOW = [
@@ -345,6 +345,20 @@ export default function PickupDetail() {
     }
   }
 
+  const openWhatsApp = () => {
+    const phone = user.phone
+    if (!phone) return
+    const digits = phone.replace(/\D/g, '')
+    const waNumber = digits.length === 10 ? `91${digits}` : digits
+    const deviceModel = pickup.model_name || pickup.device_type || 'your device'
+    const customerName = user.name || 'Customer'
+    const schedTime = pickup.pickup_scheduled_time
+      ? new Date(pickup.pickup_scheduled_time).toLocaleString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+      : ''
+    const msg = `Hi ${customerName}! 👋\n\nThis is your BuyBack Elite pickup agent. I have been assigned to collect your *${deviceModel}*.${schedTime ? `\n\n📅 Scheduled: ${schedTime}` : ''}\n\nI will be reaching your location soon. Please keep your device and ID proof ready.\n\nFeel free to reply here if you have any questions. 🙏`
+    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank')
+  }
+
   const callCustomer = () => {
     if (user.phone) {
       // Try tel: link (works on mobile/tablets), fallback to clipboard copy on desktop
@@ -468,18 +482,25 @@ export default function PickupDetail() {
                 </div>
               </div>
 
-              <div
-                onClick={callCustomer}
-                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-green-50 transition-colors"
-              >
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-green-600" />
+              <div className="flex items-center gap-2">
+                <div
+                  onClick={callCustomer}
+                  className="flex-1 flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-green-50 transition-colors"
+                >
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Phone className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500">Phone</p>
+                    <p className="font-medium text-gray-900">{user.phone || '-'}</p>
+                  </div>
+                  <span className="text-xs text-green-600 font-medium">Tap to call</span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Phone</p>
-                  <p className="font-medium text-gray-900">{user.phone || '-'}</p>
-                </div>
-                <span className="text-xs text-green-600 font-medium">Tap to call</span>
+                {user.phone && (
+                  <button onClick={openWhatsApp} className="p-3 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors shrink-0" title="WhatsApp Customer">
+                    <MessageCircle className="w-5 h-5" />
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -595,6 +616,15 @@ export default function PickupDetail() {
                 <Phone className="w-5 h-5" />
                 <span className="font-medium">Call Customer {user.phone ? `(${user.phone})` : ''}</span>
               </button>
+              {user.phone && (
+                <button
+                  onClick={openWhatsApp}
+                  className="w-full flex items-center gap-3 p-3 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition-colors"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  <span className="font-medium">WhatsApp Customer</span>
+                </button>
+              )}
             </div>
           </div>
 
