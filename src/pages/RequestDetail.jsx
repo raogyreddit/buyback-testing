@@ -181,6 +181,31 @@ export default function RequestDetail() {
             <p className="text-sm text-gray-600 mt-1">{statusConfig.desc}</p>
           </div>
 
+          {/* Store Address Card for Visit Store orders */}
+          {request.delivery_method === 'self_drop' && (
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="w-5 h-5 text-indigo-600" />
+                <h3 className="font-semibold text-gray-900">Store Address</h3>
+                <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">Visit Store</span>
+              </div>
+              <div className="bg-white/80 rounded-lg p-4 border border-indigo-100">
+                <p className="font-semibold text-sm text-gray-900">Macintosh Enterprise</p>
+                <p className="text-sm text-gray-600 mt-1">Shop No. 157, 1st Floor, The Great India Place, Sector 38A, Noida – 201301, UP, India</p>
+                <div className="flex gap-3 mt-3">
+                  <a href="https://www.google.com/maps/search/?api=1&query=Macintosh+Enterprise+The+Great+India+Place+Noida" target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-600 text-xs font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 transition-colors">
+                    <Navigation className="w-3.5 h-3.5" /> Open in Maps
+                  </a>
+                  <a href="tel:+918595611340"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-green-600 text-xs font-medium rounded-lg border border-green-200 hover:bg-green-50 transition-colors">
+                    <Phone className="w-3.5 h-3.5" /> Call Store
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Agent Tracking Card */}
           {agentTracking && ['Agent_En_Route', 'Agent_Arrived', 'Picked_Up', 'Agent_Assigned', 'Pickup_Scheduled'].includes(request.status) && (
             <div className="bg-white rounded-xl border border-blue-200 p-5 shadow-sm">

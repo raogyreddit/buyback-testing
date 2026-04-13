@@ -581,6 +581,7 @@ export const useStore = create((set, get) => ({
         id_proof_url: state.idProofUrl || null,
         id_proof_type: state.idProofType || null,
         pickup_pincode: state.personalInfo.pincode || null,
+        delivery_method: state.deliveryMethod === 'store_visit' ? 'self_drop' : 'pickup',
         ...(state.userLocation ? { user_location: state.userLocation } : {}),
         price_breakdown: {
           base_price: state.selectedModelBasePrice,
