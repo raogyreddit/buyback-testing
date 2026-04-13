@@ -4,7 +4,7 @@ import { useStore } from '../store/useStore'
 import {
   Laptop, Tablet, ArrowRight, ArrowLeft, Check, Camera, Upload,
   Monitor, Smartphone, Battery, Keyboard, Mouse, Usb, Speaker,
-  Video, Wifi, Package, ShieldCheck, ChevronDown, X, IndianRupee,
+  Video, Wifi, Package, ShieldCheck, ChevronDown, X, IndianRupee, Phone as PhoneIcon,
   CheckCircle2, AlertCircle, Info, Minus, Plus, Star, Image,
   Navigation, MapPin
 } from 'lucide-react'
@@ -146,16 +146,39 @@ export default function SellDevice() {
           <button
             onClick={() => {
               if (sellStep === 3) calculatePrice()
+              // Validate questionnaire fields before proceeding from Specs & Condition step
+              if (sellStep === 2) {
+                const missing = []
+                if (!specs.storage) missing.push('Storage')
+                if (!specs.ram) missing.push('RAM')
+                if (!specs.batteryHealth) missing.push('Battery Health')
+                if (!conditionAnswers.screenCondition) missing.push('Screen Condition')
+                if (!conditionAnswers.bodyCondition) missing.push('Body Condition')
+                if (!conditionAnswers.speakersCondition) missing.push('Speakers')
+                if (!conditionAnswers.cameraCondition) missing.push('Camera')
+                if (!conditionAnswers.wifiBluetoothCondition) missing.push('WiFi/Bluetooth')
+                if (selectedDeviceType === 'MacBook') {
+                  if (!conditionAnswers.keyboardCondition) missing.push('Keyboard')
+                  if (!conditionAnswers.trackpadCondition) missing.push('Trackpad')
+                  if (!conditionAnswers.portsCondition) missing.push('Ports')
+                }
+                if (missing.length > 0) {
+                  alert(`Please select all required fields:\n\n${missing.join('\n')}`)
+                  return
+                }
+              }
               // Validate address fields before proceeding from Personal Info step
               if (sellStep === 5) {
                 const missing = []
                 if (!personalInfo.fullName?.trim()) missing.push('Full Name')
                 if (!personalInfo.email?.trim()) missing.push('Email')
                 if (!personalInfo.phone?.trim()) missing.push('Phone Number')
-                if (!personalInfo.address?.trim()) missing.push('Full Address')
-                if (!personalInfo.city?.trim()) missing.push('City')
-                if (!personalInfo.state?.trim()) missing.push('State')
-                if (!personalInfo.pincode?.trim()) missing.push('Pincode')
+                if (store.deliveryMethod === 'pickup') {
+                  if (!personalInfo.address?.trim()) missing.push('Full Address')
+                  if (!personalInfo.city?.trim()) missing.push('City')
+                  if (!personalInfo.state?.trim()) missing.push('State')
+                  if (!personalInfo.pincode?.trim()) missing.push('Pincode')
+                }
                 if (missing.length > 0) {
                   alert(`Please fill in all required fields:\n\n${missing.join('\n')}`)
                   return
@@ -771,49 +794,74 @@ function StepPersonalInfo({ info, setInfo, deliveryMethod, setDeliveryMethod, us
             className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
             placeholder="+91 XXXXX XXXXX" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
-          <input type="text" value={info.pincode} onChange={(e) => setInfo({ pincode: e.target.value })}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
-            placeholder="e.g. 110001" />
-        </div>
+        {deliveryMethod === 'pickup' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
+            <input type="text" value={info.pincode} onChange={(e) => setInfo({ pincode: e.target.value })}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
+              placeholder="e.g. 110001" />
+          </div>
+        )}
       </div>
 
-      {/* Location Detect */}
+      {/* Store Address Card for Visit Store */}
+      {deliveryMethod === 'store_visit' && (
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-5">
+          <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-indigo-600" /> Store Address
+          </h3>
+          <p className="text-sm text-gray-700 font-medium">Macintosh Enterprise</p>
+          <p className="text-sm text-gray-600 mt-1">Shop No. 157, 1st Floor, The Great India Place, Sector 38A, Noida – 201301, UP, India</p>
+          <div className="flex gap-3 mt-3">
+            <a href="https://www.google.com/maps/search/?api=1&query=Macintosh+Enterprise+The+Great+India+Place+Noida" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-600 text-xs font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 transition-colors">
+              <Navigation className="w-3.5 h-3.5" /> Open in Maps
+            </a>
+            <a href="tel:+918595611340"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-green-600 text-xs font-medium rounded-lg border border-green-200 hover:bg-green-50 transition-colors">
+              <PhoneIcon className="w-3.5 h-3.5" /> Call Store
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Location & Address for Pickup */}
       {deliveryMethod === 'pickup' && (
-        <button onClick={detectLocation} disabled={detectingLocation}
-          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-xl hover:bg-primary-100 transition-colors disabled:opacity-50">
-          {detectingLocation ? (
-            <><div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /> Detecting...</>
-          ) : (
-            <><Navigation className="w-4 h-4" /> Detect My Location (Optional)</>
+        <>
+          <button onClick={detectLocation} disabled={detectingLocation}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-xl hover:bg-primary-100 transition-colors disabled:opacity-50">
+            {detectingLocation ? (
+              <><div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /> Detecting...</>
+            ) : (
+              <><Navigation className="w-4 h-4" /> Detect My Location (Optional)</>
+            )}
+          </button>
+          {userLocation && (
+            <p className="text-xs text-green-600 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Location detected</p>
           )}
-        </button>
-      )}
-      {userLocation && (
-        <p className="text-xs text-green-600 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Location detected</p>
-      )}
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Full Address *</label>
-        <textarea value={info.address} onChange={(e) => setInfo({ address: e.target.value })}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
-          rows={3} placeholder="Street address, locality..." />
-      </div>
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
-          <input type="text" value={info.city} onChange={(e) => setInfo({ city: e.target.value })}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
-            placeholder="City" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
-          <input type="text" value={info.state} onChange={(e) => setInfo({ state: e.target.value })}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
-            placeholder="State" />
-        </div>
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Address *</label>
+            <textarea value={info.address} onChange={(e) => setInfo({ address: e.target.value })}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
+              rows={3} placeholder="Street address, locality..." />
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+              <input type="text" value={info.city} onChange={(e) => setInfo({ city: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="City" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+              <input type="text" value={info.state} onChange={(e) => setInfo({ state: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="State" />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ID Proof (Optional) */}
       <hr className="border-gray-200" />

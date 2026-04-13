@@ -272,8 +272,8 @@ export const useStore = create((set, get) => ({
 
     let totalFlatDeduction = 0
 
-    // Helper: get deduction value (matching Flutter's null-coalescing logic)
-    const getVal = (rule) => (rule.value ?? rule.deduction_amount ?? 0)
+    // Helper: get deduction value as integer (matching Flutter's null-coalescing logic)
+    const getVal = (rule) => Math.round(rule.value ?? rule.deduction_amount ?? 0)
 
     // Screen
     const screenRule = getRule('Screen', conditionAnswers.screenCondition)
@@ -329,11 +329,10 @@ export const useStore = create((set, get) => ({
       }
     }
 
-    // Speakers, Camera, WiFi
+    // Speakers, Camera
     const otherParts = [
       ['Speakers', conditionAnswers.speakersCondition],
       ['Camera', conditionAnswers.cameraCondition],
-      ['WiFi/Bluetooth', conditionAnswers.wifiBluetoothCondition],
     ]
     otherParts.forEach(([cat, cond]) => {
       const rule = getRule(cat, cond)
@@ -343,6 +342,16 @@ export const useStore = create((set, get) => ({
         breakdown[`${cat}: ${cond}`] = `-₹${val}`
       }
     })
+
+    // WiFi/Bluetooth (DB stores as separate 'WiFi' and 'Bluetooth' categories)
+    if (conditionAnswers.wifiBluetoothCondition) {
+      const wifiRule = getRule('WiFi', conditionAnswers.wifiBluetoothCondition) || getRule('Bluetooth', conditionAnswers.wifiBluetoothCondition)
+      if (wifiRule && getVal(wifiRule) > 0) {
+        const val = getVal(wifiRule)
+        totalFlatDeduction += val
+        breakdown[`WiFi/Bluetooth: ${conditionAnswers.wifiBluetoothCondition}`] = `-₹${val}`
+      }
+    }
 
     // Storage & RAM deductions
     const storageRule = getRule('Storage', get().specs.storage)
@@ -422,7 +431,7 @@ export const useStore = create((set, get) => ({
     if (currentPrice < scrapValue) currentPrice = scrapValue
 
     // Round to nearest 100
-    currentPrice = Math.ceil(currentPrice / 100) * 100
+    currentPrice = Math.round(currentPrice / 100) * 100
 
     set({ estimatedPrice: currentPrice, priceBreakdown: breakdown })
     return currentPrice
