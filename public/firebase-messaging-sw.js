@@ -2,13 +2,13 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: "AIzaSyA4UCMLGDYoXNJvJ8TOOU9HX6GsRYFYuLw",
-  authDomain: "macbook-ipad-project.firebaseapp.com",
-  projectId: "macbook-ipad-project",
-  storageBucket: "macbook-ipad-project.firebasestorage.app",
-  messagingSenderId: "70460099632",
-  appId: "1:70460099632:web:9affa6c56c351958d131f5",
-  measurementId: "G-YKNXNMJXZ4"
+  apiKey: "AIzaSyAbEjlC8T7wJwrPHa_CJeF0AOb88IPdylM",
+  authDomain: "buybackelite-ea07f.firebaseapp.com",
+  projectId: "buybackelite-ea07f",
+  storageBucket: "buybackelite-ea07f.firebasestorage.app",
+  messagingSenderId: "573873222401",
+  appId: "1:573873222401:web:9425ee7f6f0623bb472100",
+  measurementId: "G-NWZ36LB9EH"
 });
 
 const messaging = firebase.messaging();

@@ -340,17 +340,27 @@ export default function PickupDetail() {
     }
   }
 
+  const getCustomerPhone = () => pickup?.customer_phone || user?.phone
+
+  const openWhatsApp = () => {
+    const ph = getCustomerPhone()
+    if (!ph) return
+    const clean = ph.replace(/\D/g, '')
+    const num = clean.startsWith('91') ? clean : '91' + clean
+    window.open(`https://wa.me/${num}`, '_blank')
+  }
+
   const callCustomer = () => {
-    if (user.phone) {
-      // Try tel: link (works on mobile/tablets), fallback to clipboard copy on desktop
+    const ph = getCustomerPhone()
+    if (ph) {
       const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
       if (isMobileDevice) {
-        window.open(`tel:${user.phone}`, '_self')
+        window.open(`tel:${ph}`, '_self')
       } else {
-        navigator.clipboard.writeText(user.phone).then(() => {
-          alert(`Phone number copied: ${user.phone}`)
+        navigator.clipboard.writeText(ph).then(() => {
+          alert(`Phone number copied: ${ph}`)
         }).catch(() => {
-          prompt('Copy phone number:', user.phone)
+          prompt('Copy phone number:', ph)
         })
       }
     }
@@ -445,9 +455,17 @@ export default function PickupDetail() {
                 </div>
                 <div className="flex-1">
                   <p className="text-xs text-gray-500">Phone</p>
-                  <p className="font-medium text-gray-900">{user.phone || '-'}</p>
+                  <p className="font-medium text-gray-900">{getCustomerPhone() || '-'}</p>
                 </div>
-                <span className="text-xs text-green-600 font-medium">Tap to call</span>
+                <div className="flex gap-2">
+                  <span className="text-xs text-green-600 font-medium">Tap to call</span>
+                  {getCustomerPhone() && (
+                    <button onClick={(e) => { e.stopPropagation(); openWhatsApp() }} className="px-2 py-1 bg-green-500 text-white rounded-lg text-xs font-medium hover:bg-green-600 transition-colors flex items-center gap-1">
+                      <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.207l-.304-.18-2.871.853.853-2.871-.18-.304A8 8 0 1112 20z"/></svg>
+                      WhatsApp
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -548,8 +566,17 @@ export default function PickupDetail() {
                 className="w-full flex items-center gap-3 p-3 bg-green-50 text-green-700 rounded-xl hover:bg-green-100 transition-colors"
               >
                 <Phone className="w-5 h-5" />
-                <span className="font-medium">Call Customer {user.phone ? `(${user.phone})` : ''}</span>
+                <span className="font-medium">Call Customer {getCustomerPhone() ? `(${getCustomerPhone()})` : ''}</span>
               </button>
+              {getCustomerPhone() && (
+                <button
+                  onClick={openWhatsApp}
+                  className="w-full flex items-center gap-3 p-3 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition-colors"
+                >
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.207l-.304-.18-2.871.853.853-2.871-.18-.304A8 8 0 1112 20z"/></svg>
+                  <span className="font-medium">WhatsApp Customer</span>
+                </button>
+              )}
             </div>
           </div>
 

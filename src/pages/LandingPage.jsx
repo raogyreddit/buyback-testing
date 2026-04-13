@@ -803,6 +803,15 @@ export default function LandingPage() {
               <Link to="/privacy-policy" className="hover:text-indigo-600 transition-colors">Privacy</Link>
               <Link to="/terms-of-service" className="hover:text-indigo-600 transition-colors">Terms</Link>
               <Link to="/delete-account" className="hover:text-indigo-600 transition-colors">Delete Account</Link>
+              <span className="hidden sm:block text-gray-200">|</span>
+              <a
+                href="https://YOUR_PORTFOLIO_URL_HERE.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-indigo-500 transition-colors"
+              >
+                Crafted by RAOGY
+              </a>
             </div>
           </div>
         </div>

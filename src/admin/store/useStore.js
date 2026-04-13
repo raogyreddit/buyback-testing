@@ -48,30 +48,9 @@ export const useStore = create((set, get) => ({
         return adminUser.is_active !== false ? adminUser : null
       }
 
-      // Legacy fallback: admins table
-      try {
-        const { data: legacyAdmin } = await supabase
-          .from('admins')
-          .select('*')
-          .eq('email', email)
-          .maybeSingle()
-        if (legacyAdmin) return legacyAdmin
-      } catch {}
-
-      // Optional fallback: users.role
-      try {
-        const { data: userResp } = await supabase
-          .from('users')
-          .select('id, role, name, email')
-          .eq('email', email)
-          .maybeSingle()
-        if (userResp?.role === 'admin') return userResp
-      } catch {}
-
       return null
     } catch {
-      // If tables don't exist, allow login
-      return { email, name: email.split('@')[0] }
+      return null
     }
   },
 

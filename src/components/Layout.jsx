@@ -13,6 +13,7 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
+import { requestNotificationPermission, saveFcmTokenToSupabase, onForegroundMessage } from '../lib/firebase'
 
 const navItems = [
   { path: '/dashboard', icon: Home, label: 'Dashboard', mobileLabel: 'Home' },
@@ -42,6 +43,25 @@ export default function Layout() {
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Setup FCM push notifications
+  useEffect(() => {
+    async function setupNotifications() {
+      try {
+        const token = await requestNotificationPermission();
+        if (token) {
+          await saveFcmTokenToSupabase(token);
+        }
+      } catch (err) {
+        console.error('Notification setup failed:', err);
+      }
+    }
+    setupNotifications();
+
+    onForegroundMessage((payload) => {
+      console.log('🔔 Customer received foreground notification:', payload);
+    });
   }, [])
 
   return (
@@ -141,7 +161,7 @@ export default function Layout() {
 
               {/* Right side */}
               <div className="flex items-center gap-2">
-                <button className="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <button onClick={() => navigate('/dashboard/notifications')} className="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
                   <Bell className="w-[18px] h-[18px] text-gray-400" />
                 </button>
 

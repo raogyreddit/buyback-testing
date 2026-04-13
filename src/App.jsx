@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from './store/useStore'
+import { supabase } from './lib/supabase'
 import Layout from './components/Layout'
 import LandingPage from './pages/LandingPage'
 import Home from './pages/Home'
@@ -10,10 +11,48 @@ import RequestDetail from './pages/RequestDetail'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ResetPassword from './pages/ResetPassword'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 import AboutUs from './pages/AboutUs'
 import DeleteAccount from './pages/DeleteAccount'
+import Notifications from './pages/Notifications'
+
+// Global auth listener to handle OAuth PKCE code exchange
+function AuthHandler() {
+  const navigate = useNavigate()
+  const { checkAuth } = useStore()
+
+  useEffect(() => {
+    // Handle PKCE code in URL (from Google OAuth redirect)
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('code')) {
+      supabase.auth.exchangeCodeForSession(params.get('code')).then(({ data, error }) => {
+        if (!error && data?.session) {
+          checkAuth().then(() => {
+            // Clean up URL and redirect to dashboard
+            window.history.replaceState({}, '', window.location.pathname)
+            navigate('/dashboard')
+          })
+        }
+      })
+    }
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        checkAuth()
+      }
+      if (event === 'SIGNED_OUT') {
+        useStore.getState().logout
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [navigate, checkAuth])
+
+  return null
+}
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, checkAuth } = useStore()
@@ -60,11 +99,13 @@ function ExternalRedirect({ to }) {
 function App() {
   return (
     <BrowserRouter>
+      <AuthHandler />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/about-us" element={<AboutUs />} />
@@ -88,6 +129,7 @@ function App() {
           <Route path="requests" element={<MyRequests />} />
           <Route path="requests/:id" element={<RequestDetail />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="notifications" element={<Notifications />} />
         </Route>
         
         {/* Legacy route redirects */}
