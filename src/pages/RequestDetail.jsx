@@ -311,6 +311,36 @@ export default function RequestDetail() {
                 <ConditionRow label="Speakers" value={conditions.speakers_condition || '-'} isGood={conditions.speakers_condition === 'Working'} />
                 <ConditionRow label="Camera" value={conditions.camera_condition || '-'} isGood={conditions.camera_condition === 'Working'} />
                 <ConditionRow label="WiFi/Bluetooth" value={conditions.wifi_bluetooth_condition || '-'} isGood={conditions.wifi_bluetooth_condition === 'Working'} />
+                {conditions.screen_discolouration && (
+                  <ConditionRow label="Screen Discolouration" value={conditions.screen_discolouration} isGood={conditions.screen_discolouration === 'No Discolouration'} />
+                )}
+                {conditions.screen_spots && (
+                  <ConditionRow label="Screen Spots" value={conditions.screen_spots} isGood={conditions.screen_spots === 'No spots on screen'} />
+                )}
+                {conditions.screen_lines && (
+                  <ConditionRow label="Screen Lines" value={conditions.screen_lines} isGood={conditions.screen_lines === 'No Lines'} />
+                )}
+                {conditions.dent_top_panel && (
+                  <ConditionRow label="Dent Top Panel" value={conditions.dent_top_panel} isGood={conditions.dent_top_panel === 'No Dents on top panel'} />
+                )}
+                {conditions.dent_base_panel && (
+                  <ConditionRow label="Dent Base Panel" value={conditions.dent_base_panel} isGood={conditions.dent_base_panel === 'No Dents on base panel'} />
+                )}
+                {conditions.loose_hinges && (
+                  <ConditionRow label="Loose Hinges" value={conditions.loose_hinges} isGood={conditions.loose_hinges === 'No Loose Hinges'} />
+                )}
+                {conditions.cracked_loose_panel && (
+                  <ConditionRow label="Cracked/Loose Panel" value={conditions.cracked_loose_panel} isGood={conditions.cracked_loose_panel === 'No Cracked or Loose Panel'} />
+                )}
+                {conditions.charging_port && (
+                  <ConditionRow label="Charging Port" value={conditions.charging_port} isGood={conditions.charging_port === 'Working'} />
+                )}
+                {conditions.hard_drive && (
+                  <ConditionRow label="Hard Drive / SSD" value={conditions.hard_drive} isGood={conditions.hard_drive === 'Working'} />
+                )}
+                {conditions.motherboard && (
+                  <ConditionRow label="Motherboard" value={conditions.motherboard} isGood={conditions.motherboard === 'Working fine'} />
+                )}
                 {conditions.warranty_status && (
                   <ConditionRow label="Warranty" value={conditions.warranty_status} isGood={conditions.warranty_status?.includes('Active')} />
                 )}

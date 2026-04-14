@@ -414,8 +414,60 @@ function StepQuestionnaire({ deviceType, specs, setSpecs, conditions, setConditi
             onChange={(v) => setConditions({ cameraCondition: v })} />
           <SelectField label="WiFi/Bluetooth" value={conditions.wifiBluetoothCondition} options={simpleWorkingOptions}
             onChange={(v) => setConditions({ wifiBluetoothCondition: v })} />
+          <SelectField label="Charging Port" value={conditions.chargingPort} options={simpleWorkingOptions}
+            onChange={(v) => setConditions({ chargingPort: v })} />
+          {isMac && (
+            <SelectField label="Hard Drive / SSD" value={conditions.hardDrive}
+              options={['Working', 'Missing/Defective']}
+              onChange={(v) => setConditions({ hardDrive: v })} />
+          )}
+          <SelectField label="Motherboard / Logic Board" value={conditions.motherboard}
+            options={['Working fine', 'Issue - auto restart/hanging/heating/not booting']}
+            onChange={(v) => setConditions({ motherboard: v })} />
         </div>
       </div>
+
+      <hr className="border-gray-200" />
+
+      {/* Screen Sub-Conditions */}
+      <div>
+        <h3 className="font-semibold text-gray-900 mb-3">Screen Details</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <SelectField label="Screen Discolouration" value={conditions.screenDiscolouration}
+            options={['No Discolouration', 'Minor Discolouration', 'Major Discolouration']}
+            onChange={(v) => setConditions({ screenDiscolouration: v })} />
+          <SelectField label="Spots on Screen" value={conditions.screenSpots}
+            options={['No spots on screen', '1-2 minor spots on screen', 'Large/heavy visible spots on screen']}
+            onChange={(v) => setConditions({ screenSpots: v })} />
+          <SelectField label="Lines on Screen" value={conditions.screenLines}
+            options={['No Lines', 'Visible lines on Screen', 'Display Flickering', 'Black Dots on Screen']}
+            onChange={(v) => setConditions({ screenLines: v })} />
+        </div>
+      </div>
+
+      {/* MacBook Body Sub-Conditions */}
+      {isMac && (
+        <>
+          <hr className="border-gray-200" />
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-3">Body Details (MacBook)</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <SelectField label="Dent on Top Panel" value={conditions.dentTopPanel}
+                options={['No Dents on top panel', 'Upto 2 Minor Dents', 'More than 2 Minor Dents', '1 or more Major Dents']}
+                onChange={(v) => setConditions({ dentTopPanel: v })} />
+              <SelectField label="Dent on Base Panel" value={conditions.dentBasePanel}
+                options={['No Dents on base panel', 'Upto 2 Minor Dents', 'More than 2 Minor Dents', '1 or more Major Dents']}
+                onChange={(v) => setConditions({ dentBasePanel: v })} />
+              <SelectField label="Loose Hinges" value={conditions.looseHinges}
+                options={['No Loose Hinges', 'Yes - Loose Hinges']}
+                onChange={(v) => setConditions({ looseHinges: v })} />
+              <SelectField label="Cracked or Loose Panel" value={conditions.crackedLoosePanel}
+                options={['No Cracked or Loose Panel', 'Loose Panel', 'Crack/Damage Panel']}
+                onChange={(v) => setConditions({ crackedLoosePanel: v })} />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Warranty */}
       {warrantyOptions.length > 0 && (

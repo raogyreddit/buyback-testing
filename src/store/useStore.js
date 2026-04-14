@@ -32,6 +32,16 @@ export const useStore = create((set, get) => ({
     speakersCondition: null,
     cameraCondition: null,
     wifiBluetoothCondition: null,
+    screenDiscolouration: null,
+    screenSpots: null,
+    screenLines: null,
+    dentTopPanel: null,
+    dentBasePanel: null,
+    looseHinges: null,
+    crackedLoosePanel: null,
+    chargingPort: null,
+    hardDrive: null,
+    motherboard: null,
     warrantyStatus: null,
     selectedAccessories: [],
   },
@@ -343,13 +353,49 @@ export const useStore = create((set, get) => ({
       }
     })
 
-    // WiFi/Bluetooth (DB stores as separate 'WiFi' and 'Bluetooth' categories)
+    // WiFi/Bluetooth
     if (conditionAnswers.wifiBluetoothCondition) {
-      const wifiRule = getRule('WiFi', conditionAnswers.wifiBluetoothCondition) || getRule('Bluetooth', conditionAnswers.wifiBluetoothCondition)
+      const wifiRule = getRule('WiFi/Bluetooth', conditionAnswers.wifiBluetoothCondition) || getRule('WiFi', conditionAnswers.wifiBluetoothCondition) || getRule('Bluetooth', conditionAnswers.wifiBluetoothCondition)
       if (wifiRule && getVal(wifiRule) > 0) {
         const val = getVal(wifiRule)
         totalFlatDeduction += val
         breakdown[`WiFi/Bluetooth: ${conditionAnswers.wifiBluetoothCondition}`] = `-₹${val}`
+      }
+    }
+
+    // New Cashify-style conditions
+    const newConditions = [
+      ['ScreenDiscolouration', conditionAnswers.screenDiscolouration, 'Screen Discolouration'],
+      ['ScreenSpots', conditionAnswers.screenSpots, 'Screen Spots'],
+      ['ScreenLines', conditionAnswers.screenLines, 'Screen Lines'],
+      ['DentTopPanel', conditionAnswers.dentTopPanel, 'Dent Top Panel'],
+      ['DentBasePanel', conditionAnswers.dentBasePanel, 'Dent Base Panel'],
+      ['LooseHinges', conditionAnswers.looseHinges, 'Loose Hinges'],
+      ['CrackedLoosePanel', conditionAnswers.crackedLoosePanel, 'Cracked/Loose Panel'],
+      ['ChargingPort', conditionAnswers.chargingPort, 'Charging Port'],
+      ['HardDrive', conditionAnswers.hardDrive, 'Hard Drive'],
+    ]
+    newConditions.forEach(([cat, cond, label]) => {
+      if (!cond) return
+      const rule = getRule(cat, cond)
+      if (rule && getVal(rule) > 0) {
+        const val = getVal(rule)
+        totalFlatDeduction += val
+        breakdown[`${label}: ${cond}`] = `-₹${val}`
+      }
+    })
+
+    // Motherboard (can be SCRAP_TRIGGER)
+    if (conditionAnswers.motherboard) {
+      const mbRule = getRule('Motherboard', conditionAnswers.motherboard)
+      if (mbRule && getVal(mbRule) > 0) {
+        if ((mbRule.deduction_type || '').toUpperCase() === 'SCRAP_TRIGGER') {
+          set({ estimatedPrice: scrapValue, priceBreakdown: { 'Motherboard Issue': `SCRAP - ₹${scrapValue}` } })
+          return scrapValue
+        }
+        const val = getVal(mbRule)
+        totalFlatDeduction += val
+        breakdown[`Motherboard: ${conditionAnswers.motherboard}`] = `-₹${val}`
       }
     }
 
@@ -571,6 +617,16 @@ export const useStore = create((set, get) => ({
           speakers_condition: state.conditionAnswers.speakersCondition,
           camera_condition: state.conditionAnswers.cameraCondition,
           wifi_bluetooth_condition: state.conditionAnswers.wifiBluetoothCondition,
+          screen_discolouration: state.conditionAnswers.screenDiscolouration,
+          screen_spots: state.conditionAnswers.screenSpots,
+          screen_lines: state.conditionAnswers.screenLines,
+          dent_top_panel: state.conditionAnswers.dentTopPanel,
+          dent_base_panel: state.conditionAnswers.dentBasePanel,
+          loose_hinges: state.conditionAnswers.looseHinges,
+          cracked_loose_panel: state.conditionAnswers.crackedLoosePanel,
+          charging_port: state.conditionAnswers.chargingPort,
+          hard_drive: state.conditionAnswers.hardDrive,
+          motherboard: state.conditionAnswers.motherboard,
           warranty_status: state.conditionAnswers.warrantyStatus,
           selected_accessories: state.conditionAnswers.selectedAccessories,
         },
