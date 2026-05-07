@@ -1,24 +1,22 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import {
-  ArrowLeft, Laptop, Tablet, CheckCircle2, XCircle, Clock,
-  AlertCircle, IndianRupee, Package, MapPin, Phone, Mail,
-  User, Monitor, Battery, Keyboard, Speaker, Wifi, Video,
-  MousePointer, Usb, ShieldCheck, Box, ChevronDown, ChevronUp,
-  Navigation, Truck, CreditCard, Banknote, Upload, Save,
+  ArrowLeft, Laptop, Tablet, CheckCircle2,
+  AlertCircle, Package, ChevronDown, ChevronUp,
+  CreditCard, Banknote, Save,
   ZoomIn, ChevronLeft, ChevronRight, X
 } from 'lucide-react'
 
 const STATUS_CONFIG = {
   'Pending': { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Pending Review', desc: 'Your request is being reviewed by our team.' },
   'Reviewing': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Under Review', desc: 'Our team is evaluating your device details.' },
-  'Offer_Accepted': { bg: 'bg-green-100', text: 'text-green-700', label: 'Offer Accepted', desc: 'Great! The offer has been accepted. Pickup will be scheduled.' },
-  'Seller_Confirmed': { bg: 'bg-teal-100', text: 'text-teal-700', label: 'Seller Confirmed', desc: 'You have confirmed the sale. Agent will be assigned soon.' },
-  'Agent_Assigned': { bg: 'bg-cyan-100', text: 'text-cyan-700', label: 'Agent Assigned', desc: 'An agent has been assigned for pickup.' },
-  'Agent_En_Route': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Agent En Route', desc: 'Agent is on the way to your location.' },
-  'Agent_Arrived': { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Agent Arrived', desc: 'Agent has arrived at your location.' },
+  'Offer_Accepted': { bg: 'bg-green-100', text: 'text-green-700', label: 'Offer Accepted', desc: 'Great! The offer has been accepted. Pickup will be scheduled soon.' },
+  'Seller_Confirmed': { bg: 'bg-teal-100', text: 'text-teal-700', label: 'Seller Confirmed', desc: 'You have confirmed the sale. Pickup will be scheduled soon.' },
+  'Agent_Assigned': { bg: 'bg-cyan-100', text: 'text-cyan-700', label: 'Pickup Scheduled', desc: 'Your device pickup has been scheduled.' },
+  'Agent_En_Route': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Pickup In Progress', desc: 'Pickup is in progress.' },
+  'Agent_Arrived': { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Pickup In Progress', desc: 'Pickup is in progress.' },
   'Pickup_Scheduled': { bg: 'bg-teal-100', text: 'text-teal-700', label: 'Pickup Scheduled', desc: 'Your device pickup has been scheduled.' },
   'Picked_Up': { bg: 'bg-sky-100', text: 'text-sky-700', label: 'Picked Up', desc: 'Your device has been picked up. Verification in progress.' },
   'Completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed', desc: 'Deal completed successfully! Thank you.' },
@@ -28,11 +26,10 @@ const STATUS_CONFIG = {
 export default function RequestDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { sellRequests, fetchUserRequests, cancelRequest, fetchAgentTracking, isLoading } = useStore()
+  const { sellRequests, fetchUserRequests, cancelRequest, isLoading } = useStore()
   const [expandConditions, setExpandConditions] = useState(false)
   const [actionLoading, setActionLoading] = useState(null)
-  const [agentTracking, setAgentTracking] = useState(null)
-  
+
   // Payment details state (matching Android customer app)
   const [upiId, setUpiId] = useState('')
   const [bankDetails, setBankDetails] = useState({ account_holder: '', bank_name: '', account_number: '', ifsc: '' })
@@ -50,20 +47,6 @@ export default function RequestDetail() {
   }, [id])
 
   const request = sellRequests.find(r => r.id === id)
-
-  // Fetch agent tracking for active pickup statuses
-  useEffect(() => {
-    if (request && ['Agent_En_Route', 'Agent_Arrived', 'Picked_Up', 'Agent_Assigned', 'Pickup_Scheduled'].includes(request.status)) {
-      const loadTracking = async () => {
-        const data = await fetchAgentTracking(request.id)
-        setAgentTracking(data)
-      }
-      loadTracking()
-      // Poll every 15 seconds for live updates
-      const interval = setInterval(loadTracking, 15000)
-      return () => clearInterval(interval)
-    }
-  }, [request?.id, request?.status])
 
   // Show loading while fetching
   if (isLoading && !request) {
@@ -181,97 +164,6 @@ export default function RequestDetail() {
             <p className="text-sm text-gray-600 mt-1">{statusConfig.desc}</p>
           </div>
 
-          {/* Store Address Card for Visit Store orders */}
-          {request.delivery_method === 'self_drop' && (
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="w-5 h-5 text-indigo-600" />
-                <h3 className="font-semibold text-gray-900">Store Address</h3>
-                <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">Visit Store</span>
-              </div>
-              <div className="bg-white/80 rounded-lg p-4 border border-indigo-100">
-                <p className="font-semibold text-sm text-gray-900">Macintosh Enterprise</p>
-                <p className="text-sm text-gray-600 mt-1">Shop No. 157, 1st Floor, The Great India Place, Sector 38A, Noida – 201301, UP, India</p>
-                <div className="flex gap-3 mt-3">
-                  <a href="https://www.google.com/maps/search/?api=1&query=Macintosh+Enterprise+The+Great+India+Place+Noida" target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-600 text-xs font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 transition-colors">
-                    <Navigation className="w-3.5 h-3.5" /> Open in Maps
-                  </a>
-                  <a href="tel:+918595611340"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-green-600 text-xs font-medium rounded-lg border border-green-200 hover:bg-green-50 transition-colors">
-                    <Phone className="w-3.5 h-3.5" /> Call Store
-                  </a>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Agent Tracking Card */}
-          {agentTracking && ['Agent_En_Route', 'Agent_Arrived', 'Picked_Up', 'Agent_Assigned', 'Pickup_Scheduled'].includes(request.status) && (
-            <div className="bg-white rounded-xl border border-blue-200 p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <div className={`w-3 h-3 rounded-full animate-pulse ${
-                  request.status === 'Agent_En_Route' ? 'bg-blue-500' :
-                  request.status === 'Agent_Arrived' ? 'bg-purple-500' : 'bg-teal-500'
-                }`} />
-                <h3 className="font-semibold text-gray-900">
-                  {request.status === 'Agent_En_Route' ? 'Agent is on the way!' :
-                   request.status === 'Agent_Arrived' ? 'Agent has arrived!' :
-                   'Agent Assigned'}
-                </h3>
-              </div>
-
-              {/* Agent Info */}
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-3">
-                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-indigo-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">{agentTracking.agents?.name || request.assigned_agent_name || 'Agent'}</p>
-                  {agentTracking.agents?.phone && (
-                    <a href={`tel:${agentTracking.agents.phone}`} className="text-sm text-blue-600 flex items-center gap-1">
-                      <Phone className="w-3 h-3" /> {agentTracking.agents.phone}
-                    </a>
-                  )}
-                </div>
-                {request.status === 'Agent_En_Route' && (
-                  <div className="flex items-center gap-1 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
-                    <Navigation className="w-4 h-4" />
-                    <span className="text-xs font-medium">En Route</span>
-                  </div>
-                )}
-                {request.status === 'Agent_Arrived' && (
-                  <div className="flex items-center gap-1 text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full">
-                    <MapPin className="w-4 h-4" />
-                    <span className="text-xs font-medium">Arrived</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Tracking Timeline */}
-              <div className="space-y-2 text-sm">
-                {agentTracking.started_at && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Truck className="w-4 h-4 text-blue-500" />
-                    <span>Started journey at {new Date(agentTracking.started_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                )}
-                {agentTracking.actual_arrival_time && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin className="w-4 h-4 text-purple-500" />
-                    <span>Arrived at {new Date(agentTracking.actual_arrival_time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                )}
-                {agentTracking.location_updated_at && request.status === 'Agent_En_Route' && (
-                  <div className="flex items-center gap-2 text-gray-500 text-xs mt-1">
-                    <Clock className="w-3 h-3" />
-                    <span>Location updated {new Date(agentTracking.location_updated_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Device Info */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <h3 className="font-semibold text-gray-900 mb-4">Device Information</h3>
@@ -297,52 +189,46 @@ export default function RequestDetail() {
             {expandConditions && (
               <div className="mt-4 space-y-3">
                 <ConditionRow label="Device Turns On" value={conditions.device_turns_on !== false ? 'Yes' : 'No'} isGood={conditions.device_turns_on !== false} />
-                <ConditionRow label="Screen" value={conditions.screen_condition || '-'} isGood={conditions.screen_condition === 'Perfect (No scratches)'} />
-                <ConditionRow label="Body" value={conditions.body_condition || '-'} isGood={conditions.body_condition === 'Like new'} />
+                <ConditionRow label="Repaired Before" value={conditions.is_repairable !== false ? 'No' : 'Yes'} isGood={conditions.is_repairable !== false} />
+                {conditions.screen_condition && <ConditionRow label="Screen" value={conditions.screen_condition} />}
+                {conditions.screen_discolouration && <ConditionRow label="Screen Discolouration" value={conditions.screen_discolouration} />}
+                {conditions.screen_spots && <ConditionRow label="Spots on Screen" value={conditions.screen_spots} />}
+                {conditions.screen_lines && <ConditionRow label="Lines on Screen" value={conditions.screen_lines} />}
+                {conditions.body_condition && <ConditionRow label="Body" value={conditions.body_condition} />}
                 <ConditionRow label="Charger" value={conditions.charger_available !== false ? 'Available' : 'Not Available'} isGood={conditions.charger_available !== false} />
                 <ConditionRow label="Box" value={conditions.box_available ? 'Available' : 'Not Available'} isGood={conditions.box_available} />
                 {isMac && (
                   <>
-                    <ConditionRow label="Keyboard" value={conditions.keyboard_condition || '-'} isGood={conditions.keyboard_condition === 'Working perfectly'} />
-                    <ConditionRow label="Trackpad" value={conditions.trackpad_condition || '-'} isGood={conditions.trackpad_condition === 'Working perfectly'} />
-                    <ConditionRow label="Ports" value={conditions.ports_condition || '-'} isGood={conditions.ports_condition === 'All working'} />
+                    {conditions.keyboard_condition && <ConditionRow label="Keyboard" value={conditions.keyboard_condition} />}
+                    {conditions.trackpad_condition && <ConditionRow label="Trackpad" value={conditions.trackpad_condition} />}
+                    {conditions.ports_condition && <ConditionRow label="Ports" value={conditions.ports_condition} />}
+                    {conditions.dent_top_panel && <ConditionRow label="Dent on Top Panel" value={conditions.dent_top_panel} />}
+                    {conditions.dent_base_panel && <ConditionRow label="Dent on Base Panel" value={conditions.dent_base_panel} />}
+                    {conditions.loose_hinges && <ConditionRow label="Loose Hinges" value={conditions.loose_hinges} />}
+                    {conditions.cracked_loose_panel && <ConditionRow label="Cracked or Loose Panel" value={conditions.cracked_loose_panel} />}
+                    {conditions.hard_drive && <ConditionRow label="Hard Drive / SSD" value={conditions.hard_drive} />}
+                    {conditions.motherboard && <ConditionRow label="Motherboard / Logic Board" value={conditions.motherboard} />}
                   </>
                 )}
-                <ConditionRow label="Speakers" value={conditions.speakers_condition || '-'} isGood={conditions.speakers_condition === 'Working'} />
-                <ConditionRow label="Camera" value={conditions.camera_condition || '-'} isGood={conditions.camera_condition === 'Working'} />
-                <ConditionRow label="WiFi/Bluetooth" value={conditions.wifi_bluetooth_condition || '-'} isGood={conditions.wifi_bluetooth_condition === 'Working'} />
-                {conditions.screen_discolouration && (
-                  <ConditionRow label="Screen Discolouration" value={conditions.screen_discolouration} isGood={conditions.screen_discolouration === 'No Discolouration'} />
-                )}
-                {conditions.screen_spots && (
-                  <ConditionRow label="Screen Spots" value={conditions.screen_spots} isGood={conditions.screen_spots === 'No spots on screen'} />
-                )}
-                {conditions.screen_lines && (
-                  <ConditionRow label="Screen Lines" value={conditions.screen_lines} isGood={conditions.screen_lines === 'No Lines'} />
-                )}
-                {conditions.dent_top_panel && (
-                  <ConditionRow label="Dent Top Panel" value={conditions.dent_top_panel} isGood={conditions.dent_top_panel === 'No Dents on top panel'} />
-                )}
-                {conditions.dent_base_panel && (
-                  <ConditionRow label="Dent Base Panel" value={conditions.dent_base_panel} isGood={conditions.dent_base_panel === 'No Dents on base panel'} />
-                )}
-                {conditions.loose_hinges && (
-                  <ConditionRow label="Loose Hinges" value={conditions.loose_hinges} isGood={conditions.loose_hinges === 'No Loose Hinges'} />
-                )}
-                {conditions.cracked_loose_panel && (
-                  <ConditionRow label="Cracked/Loose Panel" value={conditions.cracked_loose_panel} isGood={conditions.cracked_loose_panel === 'No Cracked or Loose Panel'} />
-                )}
-                {conditions.charging_port && (
-                  <ConditionRow label="Charging Port" value={conditions.charging_port} isGood={conditions.charging_port === 'Working'} />
-                )}
-                {conditions.hard_drive && (
-                  <ConditionRow label="Hard Drive / SSD" value={conditions.hard_drive} isGood={conditions.hard_drive === 'Working'} />
-                )}
-                {conditions.motherboard && (
-                  <ConditionRow label="Motherboard" value={conditions.motherboard} isGood={conditions.motherboard === 'Working fine'} />
-                )}
+                {conditions.speakers_condition && <ConditionRow label="Speakers" value={conditions.speakers_condition} />}
+                {conditions.camera_condition && <ConditionRow label="Camera" value={conditions.camera_condition} />}
+                {conditions.wifi_bluetooth_condition && <ConditionRow label="WiFi/Bluetooth" value={conditions.wifi_bluetooth_condition} />}
+                {conditions.charging_port && <ConditionRow label="Charging Port" value={conditions.charging_port} />}
                 {conditions.warranty_status && (
-                  <ConditionRow label="Warranty" value={conditions.warranty_status} isGood={conditions.warranty_status?.includes('Active')} />
+                  <ConditionRow label="Warranty" value={conditions.warranty_status} />
+                )}
+                {/* Declared Repair Issues (names only, no ₹ values shown to customer) */}
+                {Array.isArray(conditions.repair_issues) && conditions.repair_issues.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Declared repair issues</p>
+                    <div className="flex flex-wrap gap-2">
+                      {conditions.repair_issues.map((issue) => (
+                        <span key={issue} className="px-2.5 py-1 text-xs rounded-full bg-red-50 text-red-700 border border-red-100">
+                          {issue}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 )}
                 {/* Condition Photos */}
                 {(conditions.screen_condition_photo_url || conditions.body_condition_photo_url) && (
@@ -392,17 +278,17 @@ export default function RequestDetail() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Pricing Card */}
+          {/* Pricing Card - simplified (no deduction breakdown for customer) */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <h3 className="font-semibold text-gray-900 mb-4">Pricing</h3>
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">System Estimate</span>
+                <span className="text-gray-500">Estimated Price</span>
                 <span className="font-medium">₹{formatPrice(request.system_estimated_price)}</span>
               </div>
               {request.admin_offer_price && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Admin Offer</span>
+                  <span className="text-gray-500">Our Offer</span>
                   <span className="font-bold text-purple-600">₹{formatPrice(request.admin_offer_price)}</span>
                 </div>
               )}
@@ -425,55 +311,7 @@ export default function RequestDetail() {
               </div>
             </div>
           </div>
-
-          {/* Price Breakdown - Deductions & Bonuses */}
-          {request.price_breakdown && Object.keys(request.price_breakdown).length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-3">Deductions & Bonuses</h3>
-              {/* Base Price */}
-              {request.price_breakdown.base_price > 0 && (
-                <div className="flex justify-between text-sm py-1.5 border-b border-gray-200 mb-2">
-                  <span className="text-gray-700 font-medium">Base Price</span>
-                  <span className="font-bold text-gray-900">₹{formatPrice(request.price_breakdown.base_price)}</span>
-                </div>
-              )}
-              {/* Deductions */}
-              {request.price_breakdown.deductions && typeof request.price_breakdown.deductions === 'object' && Object.keys(request.price_breakdown.deductions).length > 0 && (
-                <div className="space-y-1">
-                  {Object.entries(request.price_breakdown.deductions).map(([key, val]) => {
-                    const numVal = typeof val === 'number' ? val : parseInt(String(val).replace(/[^\d-]/g, '')) || 0
-                    return (
-                      <div key={key} className="flex justify-between text-xs py-0.5">
-                        <span className="text-gray-600 truncate max-w-[65%]">{key}</span>
-                        <span className="font-semibold text-red-600">-₹{formatPrice(Math.abs(numVal))}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-              {/* Bonuses */}
-              {request.price_breakdown.bonuses && typeof request.price_breakdown.bonuses === 'object' && Object.keys(request.price_breakdown.bonuses).length > 0 && (
-                <div className="space-y-1 mt-2">
-                  {Object.entries(request.price_breakdown.bonuses).map(([key, val]) => {
-                    const numVal = typeof val === 'number' ? val : parseInt(String(val).replace(/[^\d-]/g, '')) || 0
-                    return (
-                      <div key={key} className="flex justify-between text-xs py-0.5">
-                        <span className="text-gray-600 truncate max-w-[65%]">{key}</span>
-                        <span className="font-semibold text-green-600">+₹{formatPrice(Math.abs(numVal))}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-              {/* Final Price */}
-              {request.price_breakdown.final_price > 0 && (
-                <div className="flex justify-between text-sm py-1.5 border-t border-gray-300 mt-2">
-                  <span className="text-gray-700 font-bold">Final Price</span>
-                  <span className="font-bold text-green-600">₹{formatPrice(request.price_breakdown.final_price)}</span>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Price breakdown / deductions are intentionally hidden from customer view. */}
 
           {/* Timeline */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
@@ -496,14 +334,6 @@ export default function RequestDetail() {
                     <p className="text-gray-500 text-xs">
                       {new Date(request.updated_at).toLocaleString('en-IN')}
                     </p>
-                  </div>
-                </div>
-              )}
-              {request.assigned_agent_name && (
-                <div className="flex gap-3">
-                  <div className="w-2 h-2 rounded-full bg-cyan-500 mt-1.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-900">Agent: {request.assigned_agent_name}</p>
                   </div>
                 </div>
               )}
@@ -697,12 +527,34 @@ function InfoRow({ label, value }) {
   )
 }
 
+// Heuristic: identifies deduction-causing condition values without a DB lookup.
+// Mirrors the admin app's color logic so customers see the same visual hint —
+// just without the ₹ amount.
+function isDeductionValue(v) {
+  if (!v || typeof v !== 'string') return false
+  const s = v.toLowerCase()
+  const badKeywords = [
+    'not working', 'not holding', 'not turning', 'not boot',
+    'cracked', 'broken', 'major', 'visible', 'distorted',
+    'spots', 'lines', 'flicker', 'discolour', 'discolor',
+    'missing', 'defective', 'issue', 'damage', 'loose',
+    'sticky', 'blurry', 'minor scratches', 'minor dents',
+    'some keys', 'some not', 'most not', 'click issues',
+    '300-499', '500-799', '800', '1000+',
+    'below 70', '70-79', '80-89',
+    'upto 2', 'more than 2', '1 or more',
+  ]
+  return badKeywords.some(k => s.includes(k))
+}
+
 function ConditionRow({ label, value, isGood }) {
+  // If isGood not explicitly passed, auto-detect from the value text.
+  const good = typeof isGood === 'boolean' ? isGood : !isDeductionValue(value)
   return (
     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
       <span className="text-sm text-gray-600">{label}</span>
-      <span className={`text-sm font-medium flex items-center gap-1.5 ${isGood ? 'text-green-600' : 'text-red-500'}`}>
-        {isGood ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+      <span className={`text-sm font-medium flex items-center gap-1.5 ${good ? 'text-green-600' : 'text-amber-600'}`}>
+        {good ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
         {value}
       </span>
     </div>

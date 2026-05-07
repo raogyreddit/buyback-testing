@@ -17,6 +17,7 @@ export const useStore = create((set, get) => ({
   specs: { ram: '', storage: '', batteryHealth: '', cycleCount: '' },
   conditionAnswers: {
     deviceTurnsOn: true,
+    isRepairable: true,
     screenOriginal: true,
     hasDents: false,
     screenIssue: false,
@@ -32,18 +33,9 @@ export const useStore = create((set, get) => ({
     speakersCondition: null,
     cameraCondition: null,
     wifiBluetoothCondition: null,
-    screenDiscolouration: null,
-    screenSpots: null,
-    screenLines: null,
-    dentTopPanel: null,
-    dentBasePanel: null,
-    looseHinges: null,
-    crackedLoosePanel: null,
-    chargingPort: null,
-    hardDrive: null,
-    motherboard: null,
     warrantyStatus: null,
     selectedAccessories: [],
+    repairIssues: [],
   },
   photos: [],
   conditionPhotos: { screen: null, body: null },
@@ -353,49 +345,13 @@ export const useStore = create((set, get) => ({
       }
     })
 
-    // WiFi/Bluetooth
+    // WiFi/Bluetooth (DB stores as separate 'WiFi' and 'Bluetooth' categories)
     if (conditionAnswers.wifiBluetoothCondition) {
-      const wifiRule = getRule('WiFi/Bluetooth', conditionAnswers.wifiBluetoothCondition) || getRule('WiFi', conditionAnswers.wifiBluetoothCondition) || getRule('Bluetooth', conditionAnswers.wifiBluetoothCondition)
+      const wifiRule = getRule('WiFi', conditionAnswers.wifiBluetoothCondition) || getRule('Bluetooth', conditionAnswers.wifiBluetoothCondition)
       if (wifiRule && getVal(wifiRule) > 0) {
         const val = getVal(wifiRule)
         totalFlatDeduction += val
         breakdown[`WiFi/Bluetooth: ${conditionAnswers.wifiBluetoothCondition}`] = `-₹${val}`
-      }
-    }
-
-    // New Cashify-style conditions
-    const newConditions = [
-      ['ScreenDiscolouration', conditionAnswers.screenDiscolouration, 'Screen Discolouration'],
-      ['ScreenSpots', conditionAnswers.screenSpots, 'Screen Spots'],
-      ['ScreenLines', conditionAnswers.screenLines, 'Screen Lines'],
-      ['DentTopPanel', conditionAnswers.dentTopPanel, 'Dent Top Panel'],
-      ['DentBasePanel', conditionAnswers.dentBasePanel, 'Dent Base Panel'],
-      ['LooseHinges', conditionAnswers.looseHinges, 'Loose Hinges'],
-      ['CrackedLoosePanel', conditionAnswers.crackedLoosePanel, 'Cracked/Loose Panel'],
-      ['ChargingPort', conditionAnswers.chargingPort, 'Charging Port'],
-      ['HardDrive', conditionAnswers.hardDrive, 'Hard Drive'],
-    ]
-    newConditions.forEach(([cat, cond, label]) => {
-      if (!cond) return
-      const rule = getRule(cat, cond)
-      if (rule && getVal(rule) > 0) {
-        const val = getVal(rule)
-        totalFlatDeduction += val
-        breakdown[`${label}: ${cond}`] = `-₹${val}`
-      }
-    })
-
-    // Motherboard (can be SCRAP_TRIGGER)
-    if (conditionAnswers.motherboard) {
-      const mbRule = getRule('Motherboard', conditionAnswers.motherboard)
-      if (mbRule && getVal(mbRule) > 0) {
-        if ((mbRule.deduction_type || '').toUpperCase() === 'SCRAP_TRIGGER') {
-          set({ estimatedPrice: scrapValue, priceBreakdown: { 'Motherboard Issue': `SCRAP - ₹${scrapValue}` } })
-          return scrapValue
-        }
-        const val = getVal(mbRule)
-        totalFlatDeduction += val
-        breakdown[`Motherboard: ${conditionAnswers.motherboard}`] = `-₹${val}`
       }
     }
 
@@ -443,9 +399,9 @@ export const useStore = create((set, get) => ({
       }
     }
 
-    // Box bonus
+    // Box bonus (try both naming variants)
     if (conditionAnswers.boxAvailable) {
-      const boxRule = getRule('Accessories', 'Box included')
+      const boxRule = getRule('Accessories', 'Box included') || getRule('Accessories', 'Original Box included')
       if (boxRule) {
         const val = getVal(boxRule)
         if (val < 0) {
@@ -466,6 +422,21 @@ export const useStore = create((set, get) => ({
             const bonus = Math.abs(val)
             totalBonus += bonus
             breakdown[acc.replace(' included', '')] = `+₹${bonus} (Bonus)`
+          }
+        }
+      })
+    }
+
+    // Repair-issues deductions (admin-managed under category 'RepairIssues')
+    if (conditionAnswers.repairIssues?.length > 0) {
+      conditionAnswers.repairIssues.forEach((issue) => {
+        const rule = getRule('RepairIssues', issue)
+        if (rule) {
+          const val = getVal(rule)
+          if (val > 0) {
+            totalFlatDeduction += val
+            currentPrice -= val
+            breakdown[`Repair: ${issue}`] = `-₹${val}`
           }
         }
       })
@@ -509,14 +480,14 @@ export const useStore = create((set, get) => ({
     selectedModelBasePrice: 0,
     specs: { ram: '', storage: '', batteryHealth: '', cycleCount: '' },
     conditionAnswers: {
-      deviceTurnsOn: true, screenOriginal: true, hasDents: false,
+      deviceTurnsOn: true, isRepairable: true, screenOriginal: true, hasDents: false,
       screenIssue: false, batteryIssue: false, keyboardIssue: false,
       chargerAvailable: true, boxAvailable: false,
       screenCondition: null, bodyCondition: null,
       keyboardCondition: null, trackpadCondition: null,
       portsCondition: null, speakersCondition: null,
       cameraCondition: null, wifiBluetoothCondition: null,
-      warrantyStatus: null, selectedAccessories: [],
+      warrantyStatus: null, selectedAccessories: [], repairIssues: [],
     },
     photos: [],
     conditionPhotos: { screen: null, body: null },
@@ -600,6 +571,7 @@ export const useStore = create((set, get) => ({
         },
         condition_answers: {
           device_turns_on: state.conditionAnswers.deviceTurnsOn,
+          is_repairable: state.conditionAnswers.isRepairable,
           screen_original: state.conditionAnswers.screenOriginal,
           has_dents: state.conditionAnswers.hasDents,
           screen_issue: state.conditionAnswers.screenIssue,
@@ -617,18 +589,9 @@ export const useStore = create((set, get) => ({
           speakers_condition: state.conditionAnswers.speakersCondition,
           camera_condition: state.conditionAnswers.cameraCondition,
           wifi_bluetooth_condition: state.conditionAnswers.wifiBluetoothCondition,
-          screen_discolouration: state.conditionAnswers.screenDiscolouration,
-          screen_spots: state.conditionAnswers.screenSpots,
-          screen_lines: state.conditionAnswers.screenLines,
-          dent_top_panel: state.conditionAnswers.dentTopPanel,
-          dent_base_panel: state.conditionAnswers.dentBasePanel,
-          loose_hinges: state.conditionAnswers.looseHinges,
-          cracked_loose_panel: state.conditionAnswers.crackedLoosePanel,
-          charging_port: state.conditionAnswers.chargingPort,
-          hard_drive: state.conditionAnswers.hardDrive,
-          motherboard: state.conditionAnswers.motherboard,
           warranty_status: state.conditionAnswers.warrantyStatus,
           selected_accessories: state.conditionAnswers.selectedAccessories,
+          repair_issues: state.conditionAnswers.repairIssues || [],
         },
         photos_url: state.photos,
         system_estimated_price: state.estimatedPrice,
@@ -636,8 +599,8 @@ export const useStore = create((set, get) => ({
         status: 'Pending',
         id_proof_url: state.idProofUrl || null,
         id_proof_type: state.idProofType || null,
+        customer_phone: state.personalInfo.phone || null,
         pickup_pincode: state.personalInfo.pincode || null,
-        delivery_method: state.deliveryMethod === 'store_visit' ? 'self_drop' : 'pickup',
         ...(state.userLocation ? { user_location: state.userLocation } : {}),
         price_breakdown: {
           base_price: state.selectedModelBasePrice,
@@ -697,19 +660,7 @@ export const useStore = create((set, get) => ({
     }
   },
 
-  // ============ AGENT TRACKING (Customer View) ============
-  fetchAgentTracking: async (requestId) => {
-    try {
-      const { data, error } = await supabase
-        .from('agent_tracking')
-        .select('*, agents(name, phone)')
-        .eq('sell_request_id', requestId)
-        .maybeSingle()
-      if (error) throw error
-      return data
-    } catch (error) {
-      console.error('Failed to fetch agent tracking:', error)
-      return null
-    }
-  },
+  // Agent tracking has been removed from customer view.
+  // Kept stub for backward compatibility with any lingering callers.
+  fetchAgentTracking: async () => null,
 }))

@@ -70,7 +70,7 @@ export default function Requests() {
     if (!searchQuery) return true
     const s = searchQuery.toLowerCase()
     return req.model_name?.toLowerCase().includes(s) || req.device_type?.toLowerCase().includes(s) ||
-      req.users?.phone?.includes(s) || req.users?.name?.toLowerCase().includes(s)
+      (req.customer_phone || req.users?.phone)?.includes(s) || req.users?.name?.toLowerCase().includes(s)
   })
 
   const openMaps = (loc) => loc?.latitude && loc?.longitude && window.open(`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`, '_blank')
@@ -197,7 +197,7 @@ export default function Requests() {
                           {req.status?.replace(/_/g, ' ')}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-0.5">{req.users?.name || req.users?.phone || '—'}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{req.users?.name || req.customer_phone || req.users?.phone || '—'}</p>
                       <div className="flex gap-3 mt-1 text-xs text-gray-500">
                         <span>Est: <b className="text-gray-800">₹{(req.system_estimated_price || 0).toLocaleString()}</b></span>
                         {req.admin_offer_price > 0 && <span>Offer: <b className="text-green-600">₹{req.admin_offer_price.toLocaleString()}</b></span>}
@@ -264,21 +264,33 @@ export default function Requests() {
                   <h4 className="text-sm font-bold text-gray-600 uppercase mb-3 flex items-center gap-1.5"><UserCheck className="w-4 h-4 text-primary-500" /> Customer</h4>
                   <div className="flex items-center gap-3 text-sm flex-wrap break-all">
                     <span className="font-semibold text-gray-900 text-base">{r.users?.name || '—'}</span>
-                    {r.users?.phone && (
+                    {(r.customer_phone || r.users?.phone) && (
                       <span className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-gray-400" /> {r.users.phone}
-                        <button onClick={() => openWAPopup(r.users.phone, r.users?.name, r.model_name || r.device_type, r.status)} className="p-1 bg-green-100 text-green-600 rounded hover:bg-green-200" title="WhatsApp Customer">
+                        <Phone className="w-3.5 h-3.5 text-gray-400" /> {r.customer_phone || r.users.phone}
+                        <button onClick={() => openWAPopup(r.customer_phone || r.users.phone, r.users?.name, r.model_name || r.device_type, r.status)} className="p-1 bg-green-100 text-green-600 rounded hover:bg-green-200" title="WhatsApp Customer">
                           <MessageCircle className="w-3 h-3" />
                         </button>
                       </span>
                     )}
                     {r.users?.email && <span className="text-gray-500">{r.users.email}</span>}
-                    {r.user_location && (
-                      <button onClick={() => openMaps(r.user_location)} className="flex items-center gap-1 text-primary-600 hover:underline font-medium">
-                        <MapPin className="w-3.5 h-3.5" /> Map
+                    {(r.pickup_address || r.user_location) && (
+                      <button
+                        onClick={() => {
+                          const loc = r.user_location
+                          if (loc?.latitude && loc?.longitude) {
+                            window.open(`https://www.google.com/maps/search/?api=1&query=${loc.latitude},${loc.longitude}`, '_blank')
+                          } else if (r.pickup_address) {
+                            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.pickup_address)}`, '_blank')
+                          }
+                        }}
+                        className="flex items-center gap-1 text-primary-600 hover:underline font-medium text-xs"
+                        title="Open in Google Maps"
+                      >
+                        <MapPin className="w-3.5 h-3.5" />
+                        {r.pickup_address ? `${r.pickup_address}${r.pickup_pincode ? ` (${r.pickup_pincode})` : ''}` : 'View on Map'}
+                        <ExternalLink className="w-3 h-3" />
                       </button>
                     )}
-                    {r.pickup_address && <span className="text-gray-500 text-xs">📍 {r.pickup_address}{r.pickup_pincode ? ` (${r.pickup_pincode})` : ''}</span>}
                   </div>
                 </div>
 

@@ -49,7 +49,7 @@ export default function Pickups() {
       return (
         (pickup.model_name || '').toLowerCase().includes(q) ||
         (user.name || '').toLowerCase().includes(q) ||
-        (user.phone || '').includes(q)
+        (pickup.customer_phone || user.phone || '').includes(q)
       )
     }
     return true
@@ -170,7 +170,7 @@ export default function Pickups() {
 
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                       <p className="text-xs text-gray-400">
-                        {user.phone || '-'}
+                        {pickup.customer_phone || user.phone || '-'}
                       </p>
                       <p className="font-bold text-gray-900">
                         ₹{(pickup.final_price || pickup.admin_offer_price || pickup.system_estimated_price || 0).toLocaleString('en-IN')}

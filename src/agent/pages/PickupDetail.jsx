@@ -346,7 +346,7 @@ export default function PickupDetail() {
   }
 
   const openWhatsApp = () => {
-    const phone = user.phone
+    const phone = pickup.customer_phone || user.phone
     if (!phone) return
     const digits = phone.replace(/\D/g, '')
     const waNumber = digits.length === 10 ? `91${digits}` : digits
@@ -360,23 +360,24 @@ export default function PickupDetail() {
   }
 
   const callCustomer = () => {
-    if (user.phone) {
+    const phone = pickup.customer_phone || user.phone
+    if (phone) {
       // Try tel: link (works on mobile/tablets), fallback to clipboard copy on desktop
       const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
       if (isMobileDevice) {
-        window.open(`tel:${user.phone}`, '_self')
+        window.open(`tel:${phone}`, '_self')
       } else {
-        navigator.clipboard.writeText(user.phone).then(() => {
-          alert(`Phone number copied: ${user.phone}`)
+        navigator.clipboard.writeText(phone).then(() => {
+          alert(`Phone number copied: ${phone}`)
         }).catch(() => {
-          prompt('Copy phone number:', user.phone)
+          prompt('Copy phone number:', phone)
         })
       }
     }
   }
 
   const openWAPopup = () => {
-    const phone = user.phone || pickup.customer_phone
+    const phone = pickup.customer_phone || user.phone
     if (!phone) return alert('Customer phone number not available')
     const name = user.name || 'Customer'
     const device = pickup.model_name || pickup.device_type || 'device'
@@ -492,11 +493,11 @@ export default function PickupDetail() {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs text-gray-500">Phone</p>
-                    <p className="font-medium text-gray-900">{user.phone || '-'}</p>
+                    <p className="font-medium text-gray-900">{pickup.customer_phone || user.phone || '-'}</p>
                   </div>
                   <span className="text-xs text-green-600 font-medium">Tap to call</span>
                 </div>
-                {user.phone && (
+                {(pickup.customer_phone || user.phone) && (
                   <button onClick={openWhatsApp} className="p-3 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors shrink-0" title="WhatsApp Customer">
                     <MessageCircle className="w-5 h-5" />
                   </button>

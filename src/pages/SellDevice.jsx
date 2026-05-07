@@ -148,6 +148,16 @@ export default function SellDevice() {
               if (sellStep === 3) calculatePrice()
               // Validate questionnaire fields before proceeding from Specs & Condition step
               if (sellStep === 2) {
+                // HARD GATE: Cannot proceed if device doesn't turn on
+                if (conditionAnswers.deviceTurnsOn === false) {
+                  alert("We can't accept devices that don't turn on. Please visit our store or contact support.")
+                  return
+                }
+                // HARD GATE: Cannot proceed if device is not repairable
+                if (conditionAnswers.isRepairable === false) {
+                  alert("We can't accept devices that have been repaired before. Please visit our store or contact support.")
+                  return
+                }
                 const missing = []
                 if (!specs.storage) missing.push('Storage')
                 if (!specs.ram) missing.push('RAM')
@@ -333,7 +343,7 @@ function StepQuestionnaire({ deviceType, specs, setSpecs, conditions, setConditi
 
   const accessoryOptions = (deductionsByCategory['Accessories'] || [])
     .filter(r => (r.value ?? r.deduction_amount ?? 0) < 0)
-    .filter(r => !['Box included', 'Charger included', 'Original Box included', 'Original Charger included'].includes(r.condition_name))
+    .filter(r => !['Box included', 'Charger included', 'Original Box included', 'Original Charger included', 'No charger', 'No box'].includes(r.condition_name))
     .filter(r => {
       if (isMac) {
         const name = r.condition_name.toLowerCase()
@@ -343,9 +353,83 @@ function StepQuestionnaire({ deviceType, specs, setSpecs, conditions, setConditi
     })
     .map(r => r.condition_name)
 
+  // GATE: if device doesn't turn on OR is not repairable, show rejection and hide the form
+  const turnsOnRejected = conditions.deviceTurnsOn === false
+  const repairRejected = conditions.isRepairable === false
+  if (turnsOnRejected || repairRejected) {
+    const reasonText = turnsOnRejected
+      ? 'Sorry, we only accept devices that power on and boot successfully. If your device does not turn on, we cannot proceed with the buyback.'
+      : "Sorry, we don't accept devices that have been repaired or opened before. We can only proceed with devices that have never been repaired."
+    return (
+      <div className="space-y-6">
+        <h2 className="text-lg font-bold text-gray-900">Device Details & Condition</h2>
+
+        <div>
+          <h3 className="font-semibold text-gray-900 mb-3">Basic Checks</h3>
+          <div className="grid md:grid-cols-2 gap-3">
+            <ToggleField
+              label="Does your device turn on?"
+              value={conditions.deviceTurnsOn}
+              onChange={(v) => setConditions({ deviceTurnsOn: v })}
+            />
+            <ToggleField
+              label="Has your device never been repaired?"
+              value={conditions.isRepairable ?? true}
+              onChange={(v) => setConditions({ isRepairable: v })}
+            />
+          </div>
+        </div>
+
+        <div className="bg-red-50 border-2 border-red-300 rounded-xl p-5">
+          <div className="flex items-start gap-3">
+            <X className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-bold text-red-700 text-lg mb-1">We can't accept this product</h3>
+              <p className="text-sm text-red-800 mb-3">{reasonText}</p>
+              <div className="bg-white rounded-lg p-3 flex items-start gap-2">
+                <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-gray-700">
+                  If this was selected by mistake, switch it back only if your device has never been repaired. For help, contact support at +91 8595611340.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-bold text-gray-900">Device Details & Condition</h2>
+
+      {/* Basic Checks */}
+      <div>
+        <h3 className="font-semibold text-gray-900 mb-3">Basic Checks</h3>
+        <div className="grid md:grid-cols-2 gap-3">
+          <ToggleField
+            label="Does your device turn on?"
+            value={conditions.deviceTurnsOn}
+            onChange={(v) => setConditions({ deviceTurnsOn: v })}
+          />
+          <ToggleField
+            label="Has your device never been repaired?"
+            value={conditions.isRepairable ?? true}
+            onChange={(v) => {
+              setConditions({ isRepairable: v })
+              if (v) setConditions({ repairIssues: [] })
+            }}
+          />
+          <ToggleField label="Screen is original?" value={conditions.screenOriginal}
+            onChange={(v) => setConditions({ screenOriginal: v })} />
+          <ToggleField label="Charger available?" value={conditions.chargerAvailable}
+            onChange={(v) => setConditions({ chargerAvailable: v })} />
+          <ToggleField label="Box available?" value={conditions.boxAvailable}
+            onChange={(v) => setConditions({ boxAvailable: v })} />
+        </div>
+      </div>
+
+      <hr className="border-gray-200" />
 
       {/* Specs */}
       <div className="grid md:grid-cols-2 gap-4">
@@ -371,22 +455,6 @@ function StepQuestionnaire({ deviceType, specs, setSpecs, conditions, setConditi
 
       <hr className="border-gray-200" />
 
-      {/* Basic checks */}
-      <div>
-        <h3 className="font-semibold text-gray-900 mb-3">Basic Checks</h3>
-        <div className="grid md:grid-cols-2 gap-3">
-          <ToggleField label="Device turns on?" value={conditions.deviceTurnsOn}
-            onChange={(v) => setConditions({ deviceTurnsOn: v })} />
-          <ToggleField label="Screen is original?" value={conditions.screenOriginal}
-            onChange={(v) => setConditions({ screenOriginal: v })} />
-          <ToggleField label="Charger available?" value={conditions.chargerAvailable}
-            onChange={(v) => setConditions({ chargerAvailable: v })} />
-          <ToggleField label="Box available?" value={conditions.boxAvailable}
-            onChange={(v) => setConditions({ boxAvailable: v })} />
-        </div>
-      </div>
-
-      <hr className="border-gray-200" />
 
       {/* Detailed conditions */}
       <div>
@@ -414,60 +482,8 @@ function StepQuestionnaire({ deviceType, specs, setSpecs, conditions, setConditi
             onChange={(v) => setConditions({ cameraCondition: v })} />
           <SelectField label="WiFi/Bluetooth" value={conditions.wifiBluetoothCondition} options={simpleWorkingOptions}
             onChange={(v) => setConditions({ wifiBluetoothCondition: v })} />
-          <SelectField label="Charging Port" value={conditions.chargingPort} options={simpleWorkingOptions}
-            onChange={(v) => setConditions({ chargingPort: v })} />
-          {isMac && (
-            <SelectField label="Hard Drive / SSD" value={conditions.hardDrive}
-              options={['Working', 'Missing/Defective']}
-              onChange={(v) => setConditions({ hardDrive: v })} />
-          )}
-          <SelectField label="Motherboard / Logic Board" value={conditions.motherboard}
-            options={['Working fine', 'Issue - auto restart/hanging/heating/not booting']}
-            onChange={(v) => setConditions({ motherboard: v })} />
         </div>
       </div>
-
-      <hr className="border-gray-200" />
-
-      {/* Screen Sub-Conditions */}
-      <div>
-        <h3 className="font-semibold text-gray-900 mb-3">Screen Details</h3>
-        <div className="grid md:grid-cols-2 gap-4">
-          <SelectField label="Screen Discolouration" value={conditions.screenDiscolouration}
-            options={['No Discolouration', 'Minor Discolouration', 'Major Discolouration']}
-            onChange={(v) => setConditions({ screenDiscolouration: v })} />
-          <SelectField label="Spots on Screen" value={conditions.screenSpots}
-            options={['No spots on screen', '1-2 minor spots on screen', 'Large/heavy visible spots on screen']}
-            onChange={(v) => setConditions({ screenSpots: v })} />
-          <SelectField label="Lines on Screen" value={conditions.screenLines}
-            options={['No Lines', 'Visible lines on Screen', 'Display Flickering', 'Black Dots on Screen']}
-            onChange={(v) => setConditions({ screenLines: v })} />
-        </div>
-      </div>
-
-      {/* MacBook Body Sub-Conditions */}
-      {isMac && (
-        <>
-          <hr className="border-gray-200" />
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Body Details (MacBook)</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <SelectField label="Dent on Top Panel" value={conditions.dentTopPanel}
-                options={['No Dents on top panel', 'Upto 2 Minor Dents', 'More than 2 Minor Dents', '1 or more Major Dents']}
-                onChange={(v) => setConditions({ dentTopPanel: v })} />
-              <SelectField label="Dent on Base Panel" value={conditions.dentBasePanel}
-                options={['No Dents on base panel', 'Upto 2 Minor Dents', 'More than 2 Minor Dents', '1 or more Major Dents']}
-                onChange={(v) => setConditions({ dentBasePanel: v })} />
-              <SelectField label="Loose Hinges" value={conditions.looseHinges}
-                options={['No Loose Hinges', 'Yes - Loose Hinges']}
-                onChange={(v) => setConditions({ looseHinges: v })} />
-              <SelectField label="Cracked or Loose Panel" value={conditions.crackedLoosePanel}
-                options={['No Cracked or Loose Panel', 'Loose Panel', 'Crack/Damage Panel']}
-                onChange={(v) => setConditions({ crackedLoosePanel: v })} />
-            </div>
-          </div>
-        </>
-      )}
 
       {/* Warranty */}
       {warrantyOptions.length > 0 && (
@@ -660,12 +676,24 @@ function StepPhotos({ photos, setPhotos, uploadPhoto, goNext }) {
 }
 
 // ============ STEP 4: PRICING ============
-function StepPricing({ basePrice, estimatedPrice, breakdown, calculatePrice, modelName, deviceType }) {
+// Customer-facing: we show ONLY the names of factors that affected the price —
+// never the individual ₹ deduction/bonus amounts. The only ₹ value shown is
+// the final Estimated Value / Final Estimate.
+function StepPricing({ basePrice: _basePrice, estimatedPrice, breakdown, calculatePrice, modelName, deviceType }) {
   useEffect(() => {
     calculatePrice()
   }, [])
 
   const formatPrice = (p) => (p || 0).toLocaleString('en-IN')
+
+  // Partition breakdown entries into name-only lists
+  const deductions = []
+  const bonuses = []
+  Object.entries(breakdown || {}).forEach(([key, val]) => {
+    const str = String(val)
+    if (str.startsWith('+')) bonuses.push(key)
+    else if (str.startsWith('-')) deductions.push(key)
+  })
 
   return (
     <div className="space-y-6">
@@ -678,33 +706,50 @@ function StepPricing({ basePrice, estimatedPrice, breakdown, calculatePrice, mod
         </div>
       </div>
 
-      {/* Base Price */}
-      <div className="bg-gray-50 rounded-xl p-4">
-        <div className="flex justify-between items-center mb-3">
-          <span className="font-medium text-gray-700">Base Price</span>
-          <span className="font-bold text-gray-900">₹{formatPrice(basePrice)}</span>
+      {/* Factor names only (no amounts). The final ₹ is above. */}
+      {(deductions.length > 0 || bonuses.length > 0) && (
+        <div className="bg-gray-50 rounded-xl p-4 space-y-4">
+          {deductions.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 text-sm mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500" />
+                Factors that reduced your price
+              </h3>
+              <ul className="space-y-1.5">
+                {deductions.map((name) => (
+                  <li key={name} className="flex items-center gap-2 text-sm text-gray-700">
+                    <span className="w-1 h-1 rounded-full bg-red-400" />
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {bonuses.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 text-sm mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                Factors that added to your price
+              </h3>
+              <ul className="space-y-1.5">
+                {bonuses.map((name) => (
+                  <li key={name} className="flex items-center gap-2 text-sm text-gray-700">
+                    <span className="w-1 h-1 rounded-full bg-green-400" />
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <hr className="border-gray-200" />
+          <div className="flex justify-between items-center">
+            <span className="font-bold text-gray-900">Final Estimate</span>
+            <span className="font-bold text-primary-600 text-lg">₹{formatPrice(estimatedPrice)}</span>
+          </div>
         </div>
-        <hr className="border-gray-200 mb-3" />
-        <h3 className="font-semibold text-gray-900 text-sm mb-2">Deductions & Bonuses</h3>
-        <div className="space-y-2">
-          {Object.entries(breakdown).map(([key, value]) => {
-            const isBonus = String(value).includes('+')
-            return (
-              <div key={key} className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">{key}</span>
-                <span className={`font-medium ${isBonus ? 'text-green-600' : 'text-red-600'}`}>
-                  {value}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-        <hr className="border-gray-200 my-3" />
-        <div className="flex justify-between items-center">
-          <span className="font-bold text-gray-900">Final Estimate</span>
-          <span className="font-bold text-primary-600 text-lg">₹{formatPrice(estimatedPrice)}</span>
-        </div>
-      </div>
+      )}
 
       <div className="bg-blue-50 rounded-xl p-4 flex gap-3">
         <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -1072,6 +1117,52 @@ function ToggleField({ label, value, onChange }) {
         value ? 'bg-green-500 justify-end' : 'bg-red-400 justify-start'
       }`}>
         <div className="w-5 h-5 bg-white rounded-full shadow mx-0.5" />
+      </div>
+    </div>
+  )
+}
+
+// Customer-facing multi-select for declared repair issues.
+// Items are read from the admin-managed `condition_deductions` rows where
+// category='RepairIssues'. Deduction amounts are NEVER shown to the customer —
+// only the name of each issue. The deductions are applied in `calculatePrice`
+// and reflected in the final Estimated Price.
+function RepairIssuesPicker({ options, selected, onToggle }) {
+  if (!options || options.length === 0) return null
+  return (
+    <div className="mt-4 p-4 rounded-xl border border-red-200 bg-red-50/60">
+      <div className="flex items-start gap-2 mb-3">
+        <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+        <div>
+          <h4 className="font-semibold text-red-700 text-sm">Declare known issues</h4>
+          <p className="text-xs text-red-800/80">
+            Tick any hardware issue your device has. Being transparent now leads to a faster, smoother pickup — our agent verifies on arrival.
+          </p>
+        </div>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-2">
+        {options.map((opt) => {
+          const name = opt.condition_name
+          const isSel = selected.includes(name)
+          return (
+            <label
+              key={name}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all ${
+                isSel ? 'border-primary-500 bg-white' : 'border-gray-200 bg-white hover:border-gray-300'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={isSel}
+                onChange={(e) => onToggle(name, e.target.checked)}
+                className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              />
+              <span className={`text-sm ${isSel ? 'text-primary-700 font-semibold' : 'text-gray-700'}`}>
+                {name}
+              </span>
+            </label>
+          )
+        })}
       </div>
     </div>
   )

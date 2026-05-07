@@ -123,7 +123,7 @@ export default function Dashboard() {
                           {request.model_name || request.device_type}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {request.users?.phone || 'Unknown'}
+                          {request.customer_phone || request.users?.phone || 'Unknown'}
                         </p>
                       </div>
                     </div>
